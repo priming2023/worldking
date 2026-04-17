@@ -138,7 +138,7 @@ export function HomeScreen() {
             href="/scan"
             className="flex min-h-[3.75rem] items-center justify-center rounded-2xl bg-amber-500 text-xl font-extrabold text-amber-950 shadow-lg outline-offset-4 ring-2 ring-amber-300/50 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 active:scale-[0.99]"
           >
-            QR 보물 찍기
+            QR 월드킹 보물 찾기
           </Link>
           <p className="text-center text-base font-medium text-slate-600">
             매장 안에 숨어 있는 QR을 카메라로 비춰 주세요.

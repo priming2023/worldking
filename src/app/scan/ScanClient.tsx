@@ -56,7 +56,7 @@ export function ScanClient({ deviceId }: ScanClientProps) {
         >
           ← 홈
         </Link>
-        <h1 className="text-xl font-extrabold text-amber-950 sm:text-2xl">QR 보물 찍기</h1>
+        <h1 className="text-xl font-extrabold text-amber-950 sm:text-2xl">QR 월드킹 보물 찾기</h1>
       </div>
 
       <div className="flex flex-wrap gap-2">
