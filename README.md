@@ -41,9 +41,9 @@ git push -u origin main
 2. **Add New… → Project** 를 누릅니다.
 3. **Import Git Repository** 목록에서 방금 만든 GitHub 저장소를 고릅니다. (안 보이면 **Adjust GitHub App Permissions** 로 저장소 접근을 허용합니다.)
 4. **Framework Preset**이 **Next.js**로 잡히는지 확인합니다. **Root Directory**는 보통 그대로 `./` 입니다.
-5. **Environment Variables** 펼친 뒤, 아래 두 줄을 **Supabase와 동일한 값**으로 추가합니다. (이름 철자가 정확해야 합니다.)
-   - `DATABASE_URL` = Transaction pooler URI  
-   - `DIRECT_URL` = Direct / Session URI  
+5. **Environment Variables** 펼친 뒤, 아래 두 줄을 **로컬 `.env`와 동일한 값**으로 추가합니다. (이름·대소문자 그대로.)
+   - `DATABASE_URL` = Transaction pooler (포트 **6543**, 가능하면 `?pgbouncer=true&connection_limit=1` 포함)  
+   - `DIRECT_URL` = **Session pooler (포트 5432, `pooler.supabase.com`)** — 로컬에서 `db.xxx.supabase.co` 가 P1001 났다면 Vercel 빌드에서도 실패할 수 있으니 **맥에서 성공한 DIRECT_URL 그대로** 복사하는 것이 안전합니다.  
 6. **Production** 체크는 기본 켜짐. Preview 배포도 쓰려면 같은 변수를 **Preview**에도 추가합니다.
 7. **Deploy** 를 누릅니다.
 
@@ -55,6 +55,21 @@ git push -u origin main
 #### 2-4. 환경 변수를 나중에 고친 경우
 
 **Settings → Environment Variables**에서 값을 바꾼 뒤에는 반드시 **Deployments → … 메뉴 → Redeploy** 로 다시 빌드해야 적용됩니다.
+
+#### 2-5. Vercel에서 `Command "npm run build" exited with 1` 일 때
+
+1. **Deployments** → 실패한 배포 클릭 → **Building** 로그를 펼칩니다.  
+2. **맨 위가 아니라 `Error:` / `ELIFECYCLE` / `prisma` 가 처음 나오는 줄**을 찾습니다. (그 줄이 원인입니다.)
+3. 아래를 순서대로 확인합니다.
+
+| 로그에 나오는 느낌 | 할 일 |
+|-------------------|--------|
+| `Environment variable not found: DIRECT_URL` (또는 DATABASE_URL) | Vercel **Settings → Environment Variables**에 두 변수 모두 있는지, **Production**(및 Preview)에 체크됐는지 확인 후 **Redeploy**. |
+| `Can't reach database server` / `P1001` | Supabase 프로젝트 **Paused** 여부, `DIRECT_URL`을 **Session pooler(5432)** 로 맞췄는지 확인. Supabase **Network / IP 제한**을 켠 경우 Vercel IP 허용이 필요할 수 있습니다. |
+| `Migration ... failed` | Supabase **SQL Editor**에서 테이블 상태를 보고, 로컬에서 `npx prisma migrate status` 결과와 비교. |
+| `Type error` / `Failed to compile` | 로컬에서 `npm run build` 를 한 번 돌려 같은 오류가 나는지 확인. |
+
+로컬(`npm run build`)은 되는데 Vercel만 안 되면 **거의 항상 1번(환경 변수)** 또는 **2번(빌드 환경에서 DB 접속)** 입니다.
 
 ### 3. 보물 코드 20개 시드 (최초 1회)
 
