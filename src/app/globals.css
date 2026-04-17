@@ -22,6 +22,23 @@ body {
   font-family: var(--font-nunito), system-ui, sans-serif;
 }
 
+/* 구 Html5QrcodeScanner의 “사진/파일로 스캔” 영어 UI — 월드킹은 카메라만 사용 */
+#html5-qrcode-anchor-scan-type-change,
+#html5-qrcode-button-file-selection,
+#html5-qrcode-private-filescan-input,
+label[for="html5-qrcode-private-filescan-input"],
+label[for="html5-qrcode-private-filescan-input"] + div {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

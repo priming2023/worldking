@@ -34,6 +34,17 @@ export async function POST(request: Request) {
     update: {},
   });
 
+  const already = await prisma.scan.findFirst({
+    where: { deviceId, code },
+    select: { id: true },
+  });
+  if (already) {
+    return NextResponse.json(
+      { status: "duplicate", code, message: "이미 찾은 보물이에요!" },
+      { status: 200 },
+    );
+  }
+
   try {
     await prisma.scan.create({
       data: { deviceId, code },
