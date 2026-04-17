@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Supabase: DATABASE_URL = Transaction pool (6543), DIRECT_URL = Session/direct (5432)
+// https://www.prisma.io/docs/orm/overview/databases/supabase
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Device {
+  id        String   @id
+  createdAt DateTime @default(now())
+  scans     Scan[]
+  claims    Claim[]
+}
+
+model TreasureQr {
+  code String @id
+}
+
+model Scan {
+  id        String   @id @default(cuid())
+  deviceId  String
+  code      String
+  scannedAt DateTime @default(now())
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, code])
+  @@index([deviceId])
+}
+
+model Claim {
+  id            String   @id @default(cuid())
+  deviceId      String
+  claimDateKst  String
+  countAtClaim  Int
+  createdAt     DateTime @default(now())
+  device        Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, claimDateKst])
+  @@index([deviceId])
+}

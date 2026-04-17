@@ -1,0 +1,18 @@
+{
+  "name": "월드킹 보물찾기",
+  "short_name": "보물찾기",
+  "description": "키즈카페 보물 QR 미션",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffbeb",
+  "theme_color": "#fbbf24",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/worldking-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
