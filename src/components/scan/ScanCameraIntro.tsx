@@ -53,7 +53,9 @@ export function ScanCameraIntro({ onStart, busy = false, error = null }: Props) 
         </div>
 
         <p className="mt-4 text-center text-base font-semibold leading-relaxed text-slate-800">
-          월드킹 여기저기에 위에 같은 보물 QR이 숨어있어요.
+          월드킹 여기저기에
+          <br />
+          위와 같은 보물 QR이 숨어있어요.
         </p>
 
         <p className="mt-3 rounded-2xl bg-amber-50/90 px-3 py-4 text-center text-base font-semibold leading-relaxed text-slate-800 ring-1 ring-amber-100">

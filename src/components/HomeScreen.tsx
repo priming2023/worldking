@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { pickEncouragement } from "@/lib/encouragement";
 import { useDeviceId } from "@/hooks/useDeviceId";
 import { useMe } from "@/hooks/useMe";
@@ -19,9 +19,22 @@ export function HomeScreen() {
   const [claimOpen, setClaimOpen] = useState(false);
   const [claimBusy, setClaimBusy] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const openedClaimFromScan = useRef(false);
 
   const count = data?.foundCount ?? 0;
   const encouragement = useMemo(() => pickEncouragement(count), [count]);
+
+  useEffect(() => {
+    if (!deviceId || loading || openedClaimFromScan.current) return;
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("openClaim") !== "1") return;
+    openedClaimFromScan.current = true;
+    router.replace("/", { scroll: false });
+    if (count >= 10 && !data?.claimedToday) {
+      setClaimOpen(true);
+    }
+  }, [deviceId, loading, count, data?.claimedToday, router]);
 
   async function confirmClaim() {
     if (!deviceId) return;
