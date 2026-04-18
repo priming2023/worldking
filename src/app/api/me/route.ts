@@ -24,6 +24,13 @@ export async function GET(request: Request) {
   });
 
   const foundCount = await prisma.scan.count({ where: { deviceId } });
+  const scanRows = await prisma.scan.findMany({
+    where: { deviceId },
+    select: { code: true },
+    distinct: ["code"],
+    orderBy: { code: "asc" },
+  });
+  const foundCodes = scanRows.map((r) => r.code);
   const claimDateKst = kstTodayString();
   const claim = await prisma.claim.findUnique({
     where: {
@@ -33,6 +40,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     foundCount,
+    foundCodes,
     claimedToday: Boolean(claim),
     todayClaim: claim
       ? { countAtClaim: claim.countAtClaim, claimDateKst: claim.claimDateKst }

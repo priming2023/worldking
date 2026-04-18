@@ -11,7 +11,7 @@ import { TREASURE_TOTAL } from "@/lib/treasure-codes";
 const primaryBtn =
   "flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl bg-amber-500 py-4 text-lg font-extrabold text-amber-950 shadow-md outline-offset-4 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 disabled:opacity-60 active:scale-[0.99]";
 const secondaryBtn =
-  "flex w-full min-h-12 items-center justify-center rounded-2xl border border-slate-200 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50";
+  "flex w-full min-h-12 flex-wrap items-center justify-center gap-2 rounded-2xl border border-slate-200 px-3 py-3 text-center text-base font-semibold text-slate-700 hover:bg-slate-50";
 
 export default function ClaimPage() {
   const deviceId = useDeviceId();
@@ -175,8 +175,14 @@ export default function ClaimPage() {
                   </span>
                 )}
               </button>
-              <Link href="/" className={secondaryBtn}>
-                취소
+              <Link href="/scan" className={secondaryBtn}>
+                <span className="select-none text-lg" aria-hidden>
+                  👋
+                </span>
+                <span>아니요. 더 찾을게요!</span>
+                <span className="select-none text-lg" aria-hidden>
+                  🔭✨
+                </span>
               </Link>
             </div>
           </section>

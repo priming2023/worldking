@@ -23,6 +23,16 @@ export function ScanCameraIntro({ onStart, busy = false, error = null }: Props) 
         <h1 className="text-xl font-extrabold text-amber-950 sm:text-2xl">QR 월드킹 보물 찾기</h1>
       </div>
 
+      <Link
+        href="/map"
+        className="flex min-h-11 items-center justify-center gap-2 rounded-2xl border-2 border-amber-300/90 bg-white/95 text-sm font-extrabold text-amber-900 shadow-sm hover:bg-amber-50"
+      >
+        <span className="select-none text-base" aria-hidden>
+          🗺️
+        </span>
+        보물지도 보기
+      </Link>
+
       <section
         className="rounded-3xl border border-amber-200 bg-white p-5 shadow-sm"
         aria-labelledby="scan-intro-title"

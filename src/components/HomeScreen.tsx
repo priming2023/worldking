@@ -29,14 +29,26 @@ export function HomeScreen() {
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-8 pb-10">
       <header className="text-center">
-        <p className="text-sm font-bold uppercase tracking-wide text-amber-800/85">
+        <p className="flex flex-wrap items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide text-amber-800/85">
+          <span className="select-none text-base normal-case" aria-hidden>
+            🏰
+          </span>
           월드킹 보물찾기
+          <span className="select-none text-base normal-case" aria-hidden>
+            ✨
+          </span>
         </p>
         <h1
           id="home-progress-label"
-          className="mt-2 text-3xl font-extrabold tracking-tight text-amber-950 sm:text-4xl"
+          className="mt-2 flex flex-wrap items-center justify-center gap-2 text-3xl font-extrabold tracking-tight text-amber-950 sm:text-4xl"
         >
+          <span className="select-none sm:text-5xl" aria-hidden>
+            🗺️
+          </span>
           오늘의 보물
+          <span className="select-none sm:text-5xl" aria-hidden>
+            💎
+          </span>
         </h1>
         <p className="mt-3 text-lg font-semibold text-slate-800">
           코인{" "}
@@ -64,7 +76,18 @@ export function HomeScreen() {
       </header>
 
       {count === 20 && (
-        <CompleteTreasureBanner claimedToday={Boolean(data?.claimedToday)} />
+        <>
+          <CompleteTreasureBanner claimedToday={Boolean(data?.claimedToday)} />
+          <Link
+            href="/map"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-400/80 bg-white/90 text-base font-extrabold text-amber-900 shadow-sm hover:bg-amber-50"
+          >
+            <span className="select-none text-lg" aria-hidden>
+              🗺️
+            </span>
+            보물지도 보기
+          </Link>
+        </>
       )}
 
       {count < 10 && <EncouragementCard text={encouragement} />}
@@ -78,16 +101,37 @@ export function HomeScreen() {
           ) : (
             <Link
               href="/claim"
-              className="flex min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 text-lg font-extrabold text-amber-950 shadow-md outline-offset-4 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 active:scale-[0.99]"
+              className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-amber-500 px-4 text-lg font-extrabold text-amber-950 shadow-md outline-offset-4 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 active:scale-[0.99]"
             >
+              <span className="select-none text-xl" aria-hidden>
+                🎁
+              </span>
               선물 받아가기
+              <span className="select-none text-xl" aria-hidden>
+                🤗
+              </span>
             </Link>
           )}
           <Link
             href="/scan"
-            className="flex min-h-14 items-center justify-center rounded-2xl border-2 border-amber-600 bg-white text-lg font-extrabold text-amber-900 shadow-sm outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-700 active:scale-[0.99]"
+            className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-amber-600 bg-white text-lg font-extrabold text-amber-900 shadow-sm outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-700 active:scale-[0.99]"
           >
+            <span className="select-none text-xl" aria-hidden>
+              🔭
+            </span>
             계속 찾기 (QR)
+            <span className="select-none text-xl" aria-hidden>
+              📷
+            </span>
+          </Link>
+          <Link
+            href="/map"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-amber-400/80 bg-white/90 text-base font-extrabold text-amber-900 shadow-sm hover:bg-amber-50 sm:col-span-2"
+          >
+            <span className="select-none text-lg" aria-hidden>
+              🗺️
+            </span>
+            보물지도 보기
           </Link>
         </section>
       )}
@@ -99,6 +143,15 @@ export function HomeScreen() {
             className="flex min-h-[3.75rem] items-center justify-center rounded-2xl bg-amber-500 text-xl font-extrabold text-amber-950 shadow-lg outline-offset-4 ring-2 ring-amber-300/50 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 active:scale-[0.99]"
           >
             QR 월드킹 보물 찾기
+          </Link>
+          <Link
+            href="/map"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 border-amber-400/80 bg-white/90 text-base font-extrabold text-amber-900 shadow-sm hover:bg-amber-50"
+          >
+            <span className="select-none text-lg" aria-hidden>
+              🗺️
+            </span>
+            보물지도 보기
           </Link>
           <p className="text-center text-base font-medium text-slate-600">
             매장 안에 숨어 있는 QR을 카메라로 비춰 주세요.

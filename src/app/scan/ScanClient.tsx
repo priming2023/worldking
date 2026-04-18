@@ -80,6 +80,16 @@ export function ScanClient({ deviceId }: ScanClientProps) {
         </div>
       </div>
 
+      <Link
+        href="/map"
+        className="flex min-h-11 items-center justify-center gap-2 rounded-2xl border-2 border-amber-300/90 bg-white/95 text-sm font-extrabold text-amber-900 shadow-sm hover:bg-amber-50"
+      >
+        <span className="select-none text-base" aria-hidden>
+          🗺️
+        </span>
+        보물지도 보기
+      </Link>
+
       {scanCameraError && (
         <p
           className="rounded-2xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-900 ring-1 ring-red-100"

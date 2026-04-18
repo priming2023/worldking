@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 
 export type MeResponse = {
   foundCount: number;
+  /** 오늘 이 기기에서 찾은 보물 코드 (예: WK01 … WK20) */
+  foundCodes: string[];
   claimedToday: boolean;
   todayClaim: { countAtClaim: number; claimDateKst: string } | null;
 };
@@ -20,8 +22,13 @@ export function useMe(deviceId: string | null) {
     try {
       const res = await fetch(`/api/me?deviceId=${encodeURIComponent(deviceId)}`);
       if (!res.ok) throw new Error("me_failed");
-      const json = (await res.json()) as MeResponse;
-      setData(json);
+      const json = (await res.json()) as Partial<MeResponse> & Pick<MeResponse, "foundCount">;
+      setData({
+        foundCount: json.foundCount,
+        foundCodes: Array.isArray(json.foundCodes) ? json.foundCodes : [],
+        claimedToday: Boolean(json.claimedToday),
+        todayClaim: json.todayClaim ?? null,
+      });
     } catch {
       setError("불러오기에 실패했어요. 잠시 후 다시 시도해 주세요.");
     } finally {

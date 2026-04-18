@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { Modal } from "@/components/Modal";
+import { playDuplicateDisappointedSound } from "@/lib/sounds/playDuplicateDisappointedSound";
 
 type Props = {
   dupOpen: boolean;
@@ -26,10 +28,44 @@ export function ScanResultModals({
   onSuccessContinue,
   onSuccessClose,
 }: Props) {
+  const dupSoundPlayedRef = useRef(false);
+
+  useEffect(() => {
+    if (!dupOpen) {
+      dupSoundPlayedRef.current = false;
+      return;
+    }
+    if (dupSoundPlayedRef.current) return;
+    dupSoundPlayedRef.current = true;
+    void playDuplicateDisappointedSound();
+  }, [dupOpen]);
+
   return (
     <>
-      <Modal open={dupOpen} title="이미 찾은 보물이에요" onClose={onDupClose}>
-        <p>이 QR은 이미 찾은 보물이에요. 다른 보물 QR을 찍어 주세요.</p>
+      <Modal
+        open={dupOpen}
+        title="😢 이미 찾은 보물이에요 🥺"
+        onClose={onDupClose}
+      >
+        <div className="space-y-4 text-center">
+          <p className="text-4xl leading-none" aria-hidden>
+            😿
+          </p>
+          <p className="text-lg font-semibold leading-relaxed text-slate-800">
+            <span className="select-none text-xl" aria-hidden>
+              📷
+            </span>{" "}
+            이 QR은 이미 찾은 보물이에요.
+            <br />
+            <span className="select-none text-xl" aria-hidden>
+              🔭
+            </span>{" "}
+            다른 보물 QR을 찍어 주세요!{" "}
+            <span className="select-none" aria-hidden>
+              💪✨
+            </span>
+          </p>
+        </div>
       </Modal>
 
       <Modal open={errOpen} title="알림" onClose={onErrClose}>
