@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { pickEncouragement } from "@/lib/encouragement";
 import { useDeviceId } from "@/hooks/useDeviceId";
 import { useMe } from "@/hooks/useMe";
-import { Modal } from "@/components/Modal";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CompleteTreasureBanner } from "@/components/home/CompleteTreasureBanner";
 import { EncouragementCard } from "@/components/home/EncouragementCard";
@@ -14,58 +12,9 @@ import { TREASURE_TOTAL } from "@/lib/treasure-codes";
 
 export function HomeScreen() {
   const deviceId = useDeviceId();
-  const { data, loading, error, refresh } = useMe(deviceId);
-  const router = useRouter();
-  const [claimOpen, setClaimOpen] = useState(false);
-  const [claimBusy, setClaimBusy] = useState(false);
-  const [claimError, setClaimError] = useState<string | null>(null);
-  const openedClaimFromScan = useRef(false);
-
+  const { data, loading, error } = useMe(deviceId);
   const count = data?.foundCount ?? 0;
   const encouragement = useMemo(() => pickEncouragement(count), [count]);
-
-  useEffect(() => {
-    if (!deviceId || loading || openedClaimFromScan.current) return;
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("openClaim") !== "1") return;
-    openedClaimFromScan.current = true;
-    router.replace("/", { scroll: false });
-    if (count >= 10 && !data?.claimedToday) {
-      setClaimOpen(true);
-    }
-  }, [deviceId, loading, count, data?.claimedToday, router]);
-
-  async function confirmClaim() {
-    if (!deviceId) return;
-    setClaimBusy(true);
-    setClaimError(null);
-    try {
-      const res = await fetch("/api/claim", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId }),
-      });
-      const json = (await res.json()) as {
-        ok?: boolean;
-        message?: string;
-        dateDisplay?: string;
-        count?: number;
-        praise?: string;
-      };
-      if (!res.ok) {
-        setClaimOpen(false);
-        setClaimError(json.message ?? "선물 받기에 실패했어요.");
-        await refresh();
-        return;
-      }
-      sessionStorage.setItem("worldking_last_gift", JSON.stringify(json));
-      setClaimOpen(false);
-      router.push("/gift");
-    } finally {
-      setClaimBusy(false);
-    }
-  }
 
   if (!deviceId) {
     return (
@@ -115,27 +64,25 @@ export function HomeScreen() {
       </header>
 
       {count === 20 && (
-        <CompleteTreasureBanner
-          claimedToday={Boolean(data?.claimedToday)}
-          onGiftClick={() => setClaimOpen(true)}
-        />
+        <CompleteTreasureBanner claimedToday={Boolean(data?.claimedToday)} />
       )}
 
       {count < 10 && <EncouragementCard text={encouragement} />}
 
       {count >= 10 && count < 20 && (
         <section className="grid gap-3 sm:grid-cols-2" aria-label="선물과 스캔">
-          <button
-            type="button"
-            disabled={Boolean(data?.claimedToday)}
-            onClick={() => {
-              if (data?.claimedToday) return;
-              setClaimOpen(true);
-            }}
-            className="min-h-14 rounded-2xl bg-amber-500 px-4 text-lg font-extrabold text-amber-950 shadow-md outline-offset-4 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 disabled:shadow-none"
-          >
-            {data?.claimedToday ? "오늘 선물 완료" : "선물 받아가기"}
-          </button>
+          {data?.claimedToday ? (
+            <span className="flex min-h-14 items-center justify-center rounded-2xl bg-slate-300 px-4 text-lg font-extrabold text-slate-600 shadow-none">
+              오늘 선물 완료
+            </span>
+          ) : (
+            <Link
+              href="/claim"
+              className="flex min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 text-lg font-extrabold text-amber-950 shadow-md outline-offset-4 hover:bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800 active:scale-[0.99]"
+            >
+              선물 받아가기
+            </Link>
+          )}
           <Link
             href="/scan"
             className="flex min-h-14 items-center justify-center rounded-2xl border-2 border-amber-600 bg-white text-lg font-extrabold text-amber-900 shadow-sm outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-700 active:scale-[0.99]"
@@ -159,45 +106,6 @@ export function HomeScreen() {
         </div>
       )}
 
-      <Modal
-        open={claimOpen}
-        title="선물 받기"
-        onClose={() => !claimBusy && setClaimOpen(false)}
-        footer={
-          <div className="mt-6 grid gap-2">
-            <button
-              type="button"
-              disabled={claimBusy}
-              onClick={confirmClaim}
-              className="w-full min-h-14 rounded-2xl bg-amber-500 py-4 text-lg font-extrabold text-amber-950 disabled:opacity-60"
-            >
-              {claimBusy ? "처리 중…" : "네, 받을게요!"}
-            </button>
-            <button
-              type="button"
-              disabled={claimBusy}
-              onClick={() => setClaimOpen(false)}
-              className="w-full min-h-12 rounded-2xl border border-slate-200 py-3 text-base font-semibold text-slate-700"
-            >
-              취소
-            </button>
-          </div>
-        }
-      >
-        <p>
-          오늘은 <strong>한 번만</strong> 선물을 받을 수 있어요. 카운터 직원에게 이
-          화면을 보여 주세요.
-        </p>
-      </Modal>
-
-      <Modal
-        open={Boolean(claimError)}
-        title="안내"
-        onClose={() => setClaimError(null)}
-        primaryLabel="알겠어요"
-      >
-        <p>{claimError}</p>
-      </Modal>
     </main>
   );
 }

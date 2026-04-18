@@ -2,10 +2,9 @@ import Link from "next/link";
 
 type Props = {
   claimedToday: boolean;
-  onGiftClick: () => void;
 };
 
-export function CompleteTreasureBanner({ claimedToday, onGiftClick }: Props) {
+export function CompleteTreasureBanner({ claimedToday }: Props) {
   return (
     <section className="rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 p-6 text-center text-amber-950 shadow-lg ring-1 ring-amber-300/60">
       <p className="text-xl font-extrabold">모든 보물을 찾았어요!</p>
@@ -16,13 +15,12 @@ export function CompleteTreasureBanner({ claimedToday, onGiftClick }: Props) {
         축하 페이지 가기
       </Link>
       {!claimedToday && (
-        <button
-          type="button"
-          onClick={onGiftClick}
-          className="mt-3 w-full min-h-14 rounded-2xl border-2 border-amber-950/25 bg-white/25 px-4 text-lg font-extrabold text-amber-950 backdrop-blur-sm active:scale-[0.99]"
+        <Link
+          href="/claim"
+          className="mt-3 flex w-full min-h-14 items-center justify-center rounded-2xl border-2 border-amber-950/25 bg-white/25 px-4 text-lg font-extrabold text-amber-950 backdrop-blur-sm active:scale-[0.99]"
         >
           선물 받아가기
-        </button>
+        </Link>
       )}
       {claimedToday && (
         <p className="mt-3 text-sm font-bold text-amber-950/90">

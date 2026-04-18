@@ -53,7 +53,7 @@ export function ScanResultModals({
               </span>
             </button>
             <Link
-              href="/?openClaim=1"
+              href="/claim"
               className="flex min-h-[3.25rem] items-center justify-center rounded-2xl border-2 border-amber-300 bg-white text-lg font-bold text-amber-900"
             >
               선물받으러 가기{" "}
