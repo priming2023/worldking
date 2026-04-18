@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
-import { CameraHelpPanel } from "@/components/scan/CameraHelpPanel";
-import { QrCameraScanner } from "@/components/scan/QrCameraScanner";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  QrCameraScanner,
+  type QrCameraFlipMeta,
+  type QrCameraScannerHandle,
+} from "@/components/scan/QrCameraScanner";
 import { ScanCameraIntro } from "@/components/scan/ScanCameraIntro";
 import { ScanResultModals } from "@/components/scan/ScanResultModals";
 import { useTreasureScanHandler } from "@/hooks/useTreasureScanHandler";
@@ -13,12 +16,23 @@ type ScanClientProps = {
   deviceId: string;
 };
 
+const defaultFlipMeta: QrCameraFlipMeta = {
+  flipDisabled: true,
+  flipLabel: "카메라 바꾸기 (뒤·앞)",
+};
+
 export function ScanClient({ deviceId }: ScanClientProps) {
   const [phase, setPhase] = useState<"intro" | "scan">("intro");
   const [scannerKey, setScannerKey] = useState(0);
   const [scanCameraError, setScanCameraError] = useState<string | null>(null);
+  const [flipMeta, setFlipMeta] = useState<QrCameraFlipMeta>(defaultFlipMeta);
+  const scannerRef = useRef<QrCameraScannerHandle>(null);
 
   const scan = useTreasureScanHandler(deviceId);
+
+  const handleFlipMeta = useCallback((meta: QrCameraFlipMeta) => {
+    setFlipMeta(meta);
+  }, []);
 
   useLayoutEffect(() => {
     if (phase !== "scan") return;
@@ -30,11 +44,6 @@ export function ScanClient({ deviceId }: ScanClientProps) {
       window.clearTimeout(t);
     };
   }, [phase]);
-
-  const goIntro = () => {
-    scan.releaseHandling();
-    setPhase("intro");
-  };
 
   if (phase === "intro") {
     return (
@@ -56,27 +65,19 @@ export function ScanClient({ deviceId }: ScanClientProps) {
         >
           ← 홈
         </Link>
-        <h1 className="text-xl font-extrabold text-amber-950 sm:text-2xl">QR 월드킹 보물 찾기</h1>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={goIntro}
-          className="min-h-11 rounded-xl border-2 border-amber-300 bg-white px-4 text-sm font-bold text-amber-900"
-        >
-          안내 다시 보기
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setScanCameraError(null);
-            setScannerKey((k) => k + 1);
-          }}
-          className="min-h-11 rounded-xl bg-amber-100 px-4 text-sm font-bold text-amber-950"
-        >
-          카메라 다시 시작
-        </button>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-2">
+          <h1 className="text-xl font-extrabold text-amber-950 sm:text-2xl">QR 보물찾기</h1>
+          <button
+            type="button"
+            onClick={() => {
+              setScanCameraError(null);
+              setScannerKey((k) => k + 1);
+            }}
+            className="shrink-0 rounded-xl bg-amber-100 px-3 py-2 text-sm font-bold text-amber-950 hover:bg-amber-200"
+          >
+            카메라 다시 시작
+          </button>
+        </div>
       </div>
 
       {scanCameraError && (
@@ -88,41 +89,35 @@ export function ScanClient({ deviceId }: ScanClientProps) {
         </p>
       )}
 
-      <ol className="grid gap-2 rounded-2xl border border-amber-100 bg-white/90 p-4 text-sm font-semibold text-slate-800 shadow-sm sm:grid-cols-3">
+      <ol className="grid gap-2 rounded-2xl border border-amber-100 bg-white/90 p-4 text-sm font-semibold text-slate-800 shadow-sm sm:grid-cols-2">
         <li className="flex gap-2 rounded-xl bg-amber-50/80 px-2 py-2">
           <span className="font-extrabold text-amber-700">1</span>
           <span>QR을 네모 안에</span>
         </li>
-        <li className="flex gap-2 rounded-xl bg-amber-50/80 px-2 py-2">
-          <span className="font-extrabold text-amber-700">2</span>
-          <span>자동 인식</span>
-        </li>
-        <li className="flex gap-2 rounded-xl bg-amber-50/80 px-2 py-2">
-          <span className="font-extrabold text-amber-700">3</span>
-          <span>연속으로 찾기</span>
+        <li className="flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-xl bg-amber-50/80 px-2 py-2">
+          <span className="flex items-center gap-2">
+            <span className="font-extrabold text-amber-700">2</span>
+            <span>자동 인식</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => scannerRef.current?.flipCamera()}
+            disabled={flipMeta.flipDisabled}
+            className="shrink-0 rounded-lg border-2 border-amber-300 bg-white px-2.5 py-1.5 text-xs font-bold text-amber-900 disabled:opacity-50"
+          >
+            {flipMeta.flipLabel}
+          </button>
         </li>
       </ol>
 
-      <p className="text-base font-medium leading-relaxed text-slate-700">
-        보물 QR을 화면 중앙에 맞추면 돼요. 한 번 카메라를 허용하면 이 페이지에 있는 동안 계속
-        찍을 수 있어요.
-      </p>
-
       <QrCameraScanner
+        ref={scannerRef}
         key={scannerKey}
         active={phase === "scan"}
         onDecoded={scan.handleDecoded}
         onCameraError={(msg) => setScanCameraError(msg)}
+        onFlipMeta={handleFlipMeta}
       />
-
-      <details className="rounded-2xl border border-amber-100 bg-white/90 p-4 shadow-sm">
-        <summary className="cursor-pointer text-base font-bold text-amber-900">
-          카메라·권한 설정 도움말
-        </summary>
-        <div className="mt-3">
-          <CameraHelpPanel />
-        </div>
-      </details>
 
       <ScanResultModals
         dupOpen={scan.dupOpen}

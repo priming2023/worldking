@@ -146,15 +146,6 @@ export function HomeScreen() {
         </div>
       )}
 
-      <footer className="mt-4 text-center">
-        <Link
-          href="/staff/print-qr"
-          className="text-xs font-semibold text-amber-900/45 underline decoration-amber-900/30 underline-offset-2 hover:text-amber-900/70"
-        >
-          직원용 · QR 인쇄
-        </Link>
-      </footer>
-
       <Modal
         open={claimOpen}
         title="선물 받기"

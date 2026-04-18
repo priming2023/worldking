@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 type Props = {
@@ -26,12 +27,51 @@ export function ScanCameraIntro({ onStart, busy = false, error = null }: Props) 
         className="rounded-3xl border border-amber-200 bg-white p-5 shadow-sm"
         aria-labelledby="scan-intro-title"
       >
-        <h2 id="scan-intro-title" className="text-lg font-extrabold text-amber-950">
-          보물을 찾으려면 카메라가 필요해요
+        <h2
+          id="scan-intro-title"
+          className="flex flex-wrap items-center justify-center gap-2 text-center text-lg font-extrabold text-amber-950"
+        >
+          <span className="select-none text-2xl" aria-hidden>
+            🎪
+          </span>
+          <span>즐거운 보물찾기 함께해요.</span>
+          <span className="select-none text-2xl" aria-hidden>
+            🎁
+          </span>
         </h2>
-        <p className="mt-3 text-base font-medium leading-relaxed text-slate-700">
-          20개의 보물 중 10개보다 많은 보물을 찾으면 찾은 만큼 코인을 받을 수 있어요. 즐겁게 보물을
-          찾은 후 카운터에서 코인 선물 받아가세요~
+
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <p className="text-center text-xs font-semibold text-amber-800/90">보물 QR 예시</p>
+          <Image
+            src="/qr-print/WK01.png"
+            alt="월드킹 보물 QR 코드 예시. 매장에 붙은 스티커와 비슷한 모양이에요."
+            width={168}
+            height={168}
+            className="rounded-2xl border-2 border-amber-200 bg-white p-2 shadow-md ring-1 ring-amber-100"
+            priority
+          />
+        </div>
+
+        <p className="mt-4 text-center text-base font-semibold leading-relaxed text-slate-800">
+          월드킹 여기저기에 위에 같은 보물 QR이 숨어있어요.
+        </p>
+
+        <p className="mt-3 rounded-2xl bg-amber-50/90 px-3 py-4 text-center text-base font-semibold leading-relaxed text-slate-800 ring-1 ring-amber-100">
+          <span className="select-none text-xl" aria-hidden>
+            🗺️
+          </span>{" "}
+          20개의 보물 중 10개보다 많은 보물을 찾으면{" "}
+          <span className="select-none text-xl" aria-hidden>
+            🪙
+          </span>{" "}
+          찾은 만큼 코인을 받을 수 있어요! 즐겁게 보물을 찾은 후 카운터에서{" "}
+          <span className="select-none text-xl" aria-hidden>
+            🎁
+          </span>{" "}
+          코인 선물 받아가세요~{" "}
+          <span className="select-none text-xl" aria-hidden>
+            ✨
+          </span>
         </p>
 
         {error && (
