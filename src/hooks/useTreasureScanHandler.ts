@@ -1,9 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { parseTreasureCode } from "@/lib/qr";
+import { TREASURE_TOTAL } from "@/lib/treasure-codes";
 
 export function useTreasureScanHandler(deviceId: string) {
+  const router = useRouter();
   const handling = useRef(false);
   const lastRawRef = useRef("");
   const lastScanAtRef = useRef(0);
@@ -57,7 +60,13 @@ export function useTreasureScanHandler(deviceId: string) {
           return;
         }
         if (json.status === "new") {
-          setSuccessCount(json.foundCount ?? 0);
+          const foundCount = json.foundCount ?? 0;
+          if (foundCount >= TREASURE_TOTAL) {
+            releaseHandling();
+            router.push("/celebrate");
+            return;
+          }
+          setSuccessCount(foundCount);
           setSuccessOpen(true);
           return;
         }
@@ -68,7 +77,7 @@ export function useTreasureScanHandler(deviceId: string) {
         setErrOpen(true);
       }
     },
-    [deviceId],
+    [deviceId, router, releaseHandling],
   );
 
   const closeDup = useCallback(() => {
