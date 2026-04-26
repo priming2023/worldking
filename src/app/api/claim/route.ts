@@ -33,7 +33,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const foundCount = await prisma.scan.count({ where: { deviceId } });
+  const foundCount = await prisma.scan.count({
+    where: { deviceId, scanDateKst: claimDateKst },
+  });
   if (foundCount < 10) {
     return NextResponse.json(
       {

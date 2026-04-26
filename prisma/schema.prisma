@@ -22,14 +22,17 @@ model TreasureQr {
 }
 
 model Scan {
-  id        String   @id @default(cuid())
-  deviceId  String
-  code      String
-  scannedAt DateTime @default(now())
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  deviceId     String
+  code         String
+  scannedAt   DateTime @default(now())
+  /// Asia/Seoul YYYY-MM-DD; same QR scannable again next calendar day (KST)
+  scanDateKst String
+  device       Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  @@unique([deviceId, code])
+  @@unique([deviceId, code, scanDateKst])
   @@index([deviceId])
+  @@index([deviceId, scanDateKst])
 }
 
 model Claim {

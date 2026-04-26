@@ -23,15 +23,15 @@ export async function GET(request: Request) {
     update: {},
   });
 
-  const foundCount = await prisma.scan.count({ where: { deviceId } });
+  const scanDateKst = kstTodayString();
+  const foundCount = await prisma.scan.count({ where: { deviceId, scanDateKst } });
   const scanRows = await prisma.scan.findMany({
-    where: { deviceId },
+    where: { deviceId, scanDateKst },
     select: { code: true },
-    distinct: ["code"],
     orderBy: { code: "asc" },
   });
   const foundCodes = scanRows.map((r) => r.code);
-  const claimDateKst = kstTodayString();
+  const claimDateKst = scanDateKst;
   const claim = await prisma.claim.findUnique({
     where: {
       deviceId_claimDateKst: { deviceId, claimDateKst },

@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { kstTodayString } from "@/lib/kst";
 import { parseTreasureCode } from "@/lib/qr";
 import { prisma } from "@/lib/prisma";
 import { scanBodySchema } from "@/lib/validation";
@@ -34,8 +35,9 @@ export async function POST(request: Request) {
     update: {},
   });
 
+  const scanDateKst = kstTodayString();
   const already = await prisma.scan.findFirst({
-    where: { deviceId, code },
+    where: { deviceId, code, scanDateKst },
     select: { id: true },
   });
   if (already) {
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
 
   try {
     await prisma.scan.create({
-      data: { deviceId, code },
+      data: { deviceId, code, scanDateKst },
     });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  const foundCount = await prisma.scan.count({ where: { deviceId } });
+  const foundCount = await prisma.scan.count({ where: { deviceId, scanDateKst } });
   return NextResponse.json({
     status: "new",
     code,
