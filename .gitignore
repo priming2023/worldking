@@ -42,5 +42,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# 로컬에서 만든 QR 고화질 묶음 (npm run qr:zip-hi)
+/qr-print-hi-wk01-20.zip
+
 # local sqlite
 /prisma/dev.db

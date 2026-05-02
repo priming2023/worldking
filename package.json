@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "qr:generate": "tsx scripts/generate-qr-files.ts",
+    "qr:zip-hi": "tsx scripts/zip-qr-hi.ts",
     "print:sheet": "tsx scripts/generate-print-sheet.ts",
     "assets:build": "npm run qr:generate && npm run print:sheet",
     "setup:local": "prisma migrate deploy && prisma db seed && npm run assets:build",

@@ -1,7 +1,8 @@
-월드킹 보물찾기 — 인쇄용 QR
+월드킹 보물찾기 — 인쇄용 QR (미리보기·시트용)
 
 각 파일은 스캔 시 다음 문자열을 담습니다: worldking:WK01 … WK20
 브라우저 미리보기: /staff/print-qr
+고해상도 개별 파일(1536px, ECC H): npm run qr:generate 시 ../qr-print-hi/ 에 함께 생성됩니다.
 
 WK01.png
 WK02.png

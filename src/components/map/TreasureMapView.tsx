@@ -56,6 +56,9 @@ export function TreasureMapView() {
         <h1 className="mt-2 text-2xl font-extrabold text-amber-950 sm:text-3xl">
           어떤 보물을 찾았을까요?
         </h1>
+        <p className="mx-auto mt-3 max-w-md text-center text-sm font-semibold leading-relaxed text-slate-600 sm:text-base">
+          보물은 화장실, 수유실, 미니룸, 파티룸에는 숨겨져 있지 않아요~
+        </p>
         <p className="mt-2 text-base font-semibold text-slate-700">
           <span className="select-none" aria-hidden>
             🪙

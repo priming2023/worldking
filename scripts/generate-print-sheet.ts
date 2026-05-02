@@ -2,7 +2,7 @@
  * 키즈카페에 붙일 QR 20개를 한 파일에 담은 인쇄용 HTML을 만듭니다.
  * (이미지 Base64 내장 → 브라우저로 열어 PDF 저장/인쇄 가능, 서버 없이도 열림)
  *
- * 선행: npm run qr:generate
+ * 선행: npm run qr:generate (고해상도는 public/qr-print-hi/)
  * 실행: npm run print:sheet
  */
 import fs from "node:fs";
@@ -10,7 +10,13 @@ import path from "node:path";
 import { TREASURE_CODES, treasurePayload } from "../src/lib/treasure-codes";
 
 function main() {
-  const qrDir = path.join(process.cwd(), "public", "qr-print");
+  const hiDir = path.join(process.cwd(), "public", "qr-print-hi");
+  const stdDir = path.join(process.cwd(), "public", "qr-print");
+  const qrDir = TREASURE_CODES.every((code) =>
+    fs.existsSync(path.join(hiDir, `${code}.png`)),
+  )
+    ? hiDir
+    : stdDir;
   const outDir = path.join(process.cwd(), "public", "print");
   fs.mkdirSync(outDir, { recursive: true });
 
