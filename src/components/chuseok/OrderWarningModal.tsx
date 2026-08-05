@@ -18,28 +18,28 @@ export function OrderWarningModal({
   return (
     <Modal
       open={open}
-      title="순서가 맞지 않아요"
+      title="다른 QR이에요"
       onClose={onCancel}
       footer={
         <div className="mt-6 flex flex-col gap-3">
           <button
             type="button"
-            onClick={onConfirm}
+            onClick={onCancel}
             className="chuseok-btn-primary min-h-12 w-full rounded-2xl py-3 text-lg font-extrabold"
           >
-            스캔할게요
+            맞는 QR 다시 찾기
           </button>
           <button
             type="button"
-            onClick={onCancel}
-            className="min-h-12 w-full rounded-2xl border-2 border-chuseok-gold/40 bg-white py-3 text-lg font-bold text-chuseok-burgundy"
+            onClick={onConfirm}
+            className="min-h-12 w-full rounded-2xl border-2 border-chuseok-gold/40 bg-white py-3 text-base font-bold text-chuseok-burgundy/80"
           >
-            취소
+            그래도 스캔하기 (순서 보너스 포기)
           </button>
         </div>
       }
     >
-      <p>{message}</p>
+      <p className="whitespace-pre-line text-base leading-relaxed">{message}</p>
     </Modal>
   );
 }

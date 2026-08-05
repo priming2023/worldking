@@ -9,12 +9,19 @@ type QuizInputProps = {
   disabled?: boolean;
 };
 
-/** 유니코드 글자 단위로 분리 (한글 음절 1자 = 1칸) */
+/** NFC 기준 글자 배열 (한글 1음절 = 1글자) */
 function graphemes(text: string): string[] {
-  return Array.from(text.normalize("NFC")).filter((c) => c.trim() !== "" || c === " ");
+  return Array.from(text.normalize("NFC"));
 }
 
-/** 네모칸 주관식 — 한글 IME 조합 지원, 띄어쓰기는 그룹 사이 gap */
+/** 칸에는 항상 최대 1글자만 */
+function singleGrapheme(text: string): string {
+  const g = graphemes(text);
+  if (g.length === 0) return "";
+  return g[g.length - 1] ?? "";
+}
+
+/** 네모칸 주관식 — 칸당 1글자 + 한글 IME 조합 */
 export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
   const flatCount = display.reduce((s, g) => s + g.length, 0);
   const [chars, setChars] = useState<string[]>(() => Array(flatCount).fill(""));
@@ -34,40 +41,33 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
     el.select();
   }, []);
 
-  const setCharAt = useCallback((flatIndex: number, ch: string) => {
-    setChars((prev) => {
-      const next = [...prev];
-      next[flatIndex] = ch;
-      return next;
-    });
-  }, []);
-
-  /** 완성된 글자 확정 후 다음 칸으로 */
-  const commitAndAdvance = useCallback(
+  /** 이 칸에 1글자만 넣고, 남는 글자는 다음 칸으로 */
+  const commitChars = useCallback(
     (flatIndex: number, raw: string) => {
-      const parts = graphemes(raw.replace(/\s/g, ""));
-      if (parts.length === 0) {
-        setCharAt(flatIndex, "");
-        return;
-      }
-
+      const parts = graphemes(raw).filter((c) => c !== " ");
       setChars((prev) => {
         const next = [...prev];
+        if (parts.length === 0) {
+          next[flatIndex] = "";
+          return next;
+        }
         let i = flatIndex;
         for (const p of parts) {
           if (i >= flatCount) break;
-          next[i] = p;
+          next[i] = p; // 칸당 정확히 1글자
           i += 1;
         }
         return next;
       });
-
-      const nextIndex = Math.min(flatIndex + parts.length, flatCount - 1);
-      if (flatIndex + parts.length < flatCount) {
-        requestAnimationFrame(() => focusAt(nextIndex));
+      if (parts.length === 0) return;
+      const advanceTo = flatIndex + parts.length;
+      if (advanceTo < flatCount) {
+        requestAnimationFrame(() => focusAt(advanceTo));
+      } else if (flatIndex < flatCount - 1) {
+        requestAnimationFrame(() => focusAt(flatCount - 1));
       }
     },
-    [flatCount, focusAt, setCharAt],
+    [flatCount, focusAt],
   );
 
   const handleCompositionStart = useCallback(() => {
@@ -77,25 +77,30 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
   const handleCompositionEnd = useCallback(
     (flatIndex: number, e: React.CompositionEvent<HTMLInputElement>) => {
       composingRef.current = false;
-      commitAndAdvance(flatIndex, e.currentTarget.value || e.data || "");
+      // 조합 완료 → 이 칸에는 완성된 1글자만
+      const raw = e.data || e.currentTarget.value || "";
+      commitChars(flatIndex, singleGrapheme(raw));
     },
-    [commitAndAdvance],
+    [commitChars],
   );
 
   const handleChange = useCallback(
     (flatIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
 
-      // 한글 조합 중: 중간 자모(ㅅ→소→송)를 칸에 그대로 보여 줌, 칸 이동 없음
       if (composingRef.current) {
-        setCharAt(flatIndex, value);
+        // 조합 중(ㅅ→소→송): 화면에 1음절만 허용
+        setChars((prev) => {
+          const next = [...prev];
+          next[flatIndex] = singleGrapheme(value);
+          return next;
+        });
         return;
       }
 
-      // 영문·숫자·붙여넣기 등 (조합 없음)
-      commitAndAdvance(flatIndex, value);
+      commitChars(flatIndex, value);
     },
-    [commitAndAdvance, setCharAt],
+    [commitChars],
   );
 
   const handleKeyDown = useCallback(
@@ -104,12 +109,21 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
 
       if (e.key === "Backspace") {
         if (chars[flatIndex]) {
-          setCharAt(flatIndex, "");
+          e.preventDefault();
+          setChars((prev) => {
+            const next = [...prev];
+            next[flatIndex] = "";
+            return next;
+          });
           return;
         }
         if (flatIndex > 0) {
           e.preventDefault();
-          setCharAt(flatIndex - 1, "");
+          setChars((prev) => {
+            const next = [...prev];
+            next[flatIndex - 1] = "";
+            return next;
+          });
           focusAt(flatIndex - 1);
         }
         return;
@@ -124,7 +138,7 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
         focusAt(flatIndex + 1);
       }
     },
-    [chars, flatCount, focusAt, setCharAt],
+    [chars, flatCount, focusAt],
   );
 
   const handleSubmit = useCallback(
@@ -168,7 +182,7 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
                     value={chars[i] ?? ""}
                     disabled={disabled}
                     aria-label={`글자 ${i + 1}`}
-                    className="chuseok-box-input h-12 w-11 rounded-lg border-2 border-chuseok-gold/50 bg-white/95 text-center text-xl font-bold text-chuseok-burgundy shadow-sm focus:border-chuseok-gold focus:outline-none focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50 sm:h-14 sm:w-12 sm:text-2xl"
+                    className="chuseok-box-input h-12 w-11 overflow-hidden rounded-lg border-2 border-chuseok-gold/50 bg-white/95 text-center text-xl font-bold text-chuseok-burgundy shadow-sm focus:border-chuseok-gold focus:outline-none focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50 sm:h-14 sm:w-12 sm:text-2xl"
                     onChange={(e) => handleChange(i, e)}
                     onCompositionStart={handleCompositionStart}
                     onCompositionEnd={(e) => handleCompositionEnd(i, e)}

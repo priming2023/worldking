@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { isMissionCode } from "@/lib/chuseok/codes";
+import { isMissionCode, MISSION_TOTAL } from "@/lib/chuseok/codes";
 import {
   afterCorrectScan,
   startUnorderedFromScan,
@@ -10,9 +10,9 @@ import { estimateReward } from "@/lib/chuseok/reward";
 import {
   ensureDevice,
   getMissionScans,
+  getMissionSteps,
   getOrCreateMissionProgress,
 } from "@/lib/chuseok/db";
-import { MISSION_TOTAL } from "@/lib/chuseok/codes";
 import { kstTodayString } from "@/lib/kst";
 import { parseTreasureCode } from "@/lib/qr";
 import { prisma } from "@/lib/prisma";
@@ -55,50 +55,61 @@ export async function POST(request: Request) {
     awaitingScanCode: progress.awaitingScanCode,
   };
 
-  // 순서 검증
+  const steps = await getMissionSteps();
+  const expectedStep = progress.awaitingScanCode
+    ? steps.find((s) => s.qrCode === progress.awaitingScanCode)
+    : null;
+
+  // 순서 모드: 퀴즈 정답 후 지정된 QR만 통과
   if (progress.orderedMode) {
     const isFirstScanWithoutQuiz =
       progress.quizzesPassed === 0 && progress.phase === "quiz";
 
     if (isFirstScanWithoutQuiz) {
-      // 퀴즈 없이 첫 스캔 → 무순서 모드 (경고 없음)
-      const newState = startUnorderedFromScan(state);
+      // 퀴즈 없이 스캔 시작 → 무순서 모드
       progress = await prisma.missionProgress.update({
         where: { id: progress.id },
-        data: { orderedMode: newState.orderedMode },
+        data: { orderedMode: startUnorderedFromScan(state).orderedMode },
       });
     } else if (progress.phase === "scan" && progress.awaitingScanCode) {
       if (code !== progress.awaitingScanCode) {
+        const hint = expectedStep?.locationHint ?? progress.awaitingScanCode;
         if (!confirmOutOfOrder) {
           return NextResponse.json({
             status: "order_warning",
-            message:
-              "순서에 맞지 않게 QR코드를 스캔할 경우 2배 보물미션 대신 찾은 QR코드 갯수만큼 코인을 받게 됩니다. 스캔할까요?",
+            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n다른 QR을 스캔하면 순서 보너스(20코인)를 받을 수 없어요. 그래도 스캔할까요?`,
             scannedCode: code,
             expectedCode: progress.awaitingScanCode,
+            locationHint: expectedStep?.locationHint ?? null,
           });
         }
-        const newState = switchToUnordered(state);
+        // 확인 후 무순서 전환 + 해당 QR 기록
         progress = await prisma.missionProgress.update({
           where: { id: progress.id },
-          data: { orderedMode: newState.orderedMode },
+          data: {
+            orderedMode: switchToUnordered(state).orderedMode,
+            phase: "quiz",
+            awaitingScanCode: null,
+          },
         });
       }
-    } else if (progress.phase === "quiz" && progress.quizzesPassed > 0) {
-      // 퀴즈 풀고 스캔 전인데 다른 QR 스캔
+    } else if (progress.phase === "quiz") {
+      // 아직 퀴즈 단계인데 QR을 찍음
       if (!confirmOutOfOrder) {
         return NextResponse.json({
           status: "order_warning",
           message:
-            "순서에 맞지 않게 QR코드를 스캔할 경우 2배 보물미션 대신 찾은 QR코드 갯수만큼 코인을 받게 됩니다. 스캔할까요?",
+            "지금은 퀴즈를 먼저 풀어 주세요!\n퀴즈 없이 QR만 스캔하면 순서 보너스(20코인)를 받을 수 없어요. 그래도 스캔할까요?",
           scannedCode: code,
           expectedCode: null,
         });
       }
-      const newState = switchToUnordered(state);
       progress = await prisma.missionProgress.update({
         where: { id: progress.id },
-        data: { orderedMode: newState.orderedMode },
+        data: {
+          orderedMode: switchToUnordered(state).orderedMode,
+          awaitingScanCode: null,
+        },
       });
     }
   }
@@ -120,7 +131,7 @@ export async function POST(request: Request) {
     throw e;
   }
 
-  // 순서 모드에서 올바른 스캔 → 다음 퀴즈
+  // 올바른 QR(예: 퀴즈1 → WK01) 스캔 시에만 다음 퀴즈로
   if (
     progress.orderedMode &&
     progress.phase === "scan" &&
@@ -150,15 +161,22 @@ export async function POST(request: Request) {
   );
 
   const foundCount = scans.length;
-  const missionComplete = foundCount >= MISSION_TOTAL;
+  const missionComplete =
+    foundCount >= MISSION_TOTAL &&
+    (!updatedProgress.orderedMode ||
+      updatedProgress.quizzesPassed >= MISSION_TOTAL);
 
   return NextResponse.json({
     status: "new",
     code,
     foundCount,
-    message: "새 보물을 찾았어요!",
+    message:
+      updatedProgress.orderedMode && updatedProgress.phase === "quiz"
+        ? "보물을 찾았어요! 다음 퀴즈로 가요."
+        : "새 보물을 찾았어요!",
     orderedMode: updatedProgress.orderedMode,
     expectedCoins: reward.coins,
     missionComplete,
+    nextPhase: updatedProgress.phase,
   });
 }
