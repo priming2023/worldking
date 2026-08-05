@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChuseokProgressBar } from "@/components/chuseok/ChuseokProgressBar";
 import { ChuseokIntro } from "@/components/chuseok/ChuseokIntro";
 import { QuizInput } from "@/components/chuseok/QuizInput";
@@ -20,6 +20,17 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
   const [submitting, setSubmitting] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [correctFlash, setCorrectFlash] = useState<string | null>(null);
+
+  // 이미 진행 중이면 인트로 건너뛰고 바로 다음 퀴즈/스캔
+  useEffect(() => {
+    if (!data) return;
+    const started =
+      data.quizzesPassed > 0 ||
+      data.foundCount > 0 ||
+      data.phase === "scan" ||
+      data.missionComplete;
+    if (started) setShowIntro(false);
+  }, [data]);
 
   const handleQuizSubmit = async (answer: string) => {
     setSubmitting(true);
@@ -39,7 +50,6 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         const hint = json.locationHint ?? "";
         setCorrectFlash(json.message ?? `다음 보물미션 위치는 ${hint} 입니다.`);
         await refresh();
-        // 위치 안내를 잠깐 보여 준 뒤 카메라 스캔으로 이동
         window.setTimeout(() => {
           router.push("/chuseok/scan?auto=1");
         }, 900);
@@ -76,6 +86,7 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
 
   const count = data?.foundCount ?? 0;
   const expectedCoins = data?.expectedCoins ?? 0;
+  const introVisible = showIntro && (data?.quizzesPassed ?? 0) === 0 && count === 0;
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-8 pb-10">
@@ -103,7 +114,7 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </div>
       </header>
 
-      {showIntro && <ChuseokIntro onStart={() => setShowIntro(false)} />}
+      {introVisible && <ChuseokIntro onStart={() => setShowIntro(false)} />}
 
       {correctFlash && (
         <section className="chuseok-card-highlight rounded-3xl p-5 text-center" role="status">
@@ -115,7 +126,7 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
-      {!showIntro && !correctFlash && data?.phase === "scan" && data.locationHint && (
+      {!introVisible && !correctFlash && data?.phase === "scan" && data.locationHint && (
         <section className="chuseok-card-highlight rounded-3xl p-5 text-center">
           <p className="text-sm font-bold text-chuseok-gold">보물 위치</p>
           <p className="mt-2 text-xl font-extrabold text-chuseok-burgundy">
@@ -130,7 +141,7 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
-      {!showIntro && !correctFlash && data?.phase === "quiz" && data.currentQuiz && (
+      {!introVisible && !correctFlash && data?.phase === "quiz" && data.currentQuiz && (
         <section className="chuseok-card rounded-3xl p-5">
           <p className="text-sm font-bold text-chuseok-gold">
             퀴즈 {data.currentQuiz.stepOrder} / {MISSION_TOTAL}
@@ -153,7 +164,7 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
-      {!showIntro && data?.missionComplete && (
+      {!introVisible && data?.missionComplete && (
         <section className="chuseok-card-highlight rounded-3xl p-5 text-center">
           <p className="text-xl font-extrabold text-chuseok-burgundy">모든 보물을 찾았어요! 🎉</p>
           <Link
