@@ -28,38 +28,39 @@
 ### 보존
 - [x] Git tag `treasure-hunt-v1` 생성
 - [x] plan.md 최상단 기존 QR보물찾기 URL 기록
-- [ ] 기존 `/`, `/api/*` 코드 diff 없음 확인
+- [x] 기존 `/`, `/api/*` 코드 diff 없음 확인
 
 ### DB·API
-- [ ] MissionStep / MissionProgress / MissionScan / MissionClaim migration
-- [ ] 10개 위치 + 퀴즈 seed
-- [ ] GET `/api/chuseok/me`
-- [ ] POST `/api/chuseok/quiz`
-- [ ] POST `/api/chuseok/scan` (순서 경고·무순서 전환)
-- [ ] POST `/api/chuseok/claim` (하루 1회)
+- [x] MissionStep / MissionProgress / MissionScan / MissionClaim migration
+- [x] 10개 위치 + 퀴즈 seed
+- [x] GET `/api/chuseok/me`
+- [x] POST `/api/chuseok/quiz`
+- [x] POST `/api/chuseok/scan` (순서 경고·무순서 전환)
+- [x] POST `/api/chuseok/claim` (하루 1회)
 
 ### UI
-- [ ] `/chuseok` 게임 설명 + 퀴즈 1
-- [ ] QuizInput 네모칸 (띄어쓰기 표현)
-- [ ] 정답 시 위치 안내 문구
-- [ ] `/chuseok/scan` + OrderWarningModal
-- [ ] 진행바 (10칸) + 코인 예상 표시
-- [ ] `/chuseok/claim` + `/chuseok/complete`
-- [ ] 추석 테마 CSS
+- [x] `/chuseok` 게임 설명 + 퀴즈 1
+- [x] QuizInput 네모칸 (띄어쓰기 표현)
+- [x] 정답 시 위치 안내 문구
+- [x] `/chuseok/scan` + OrderWarningModal
+- [x] 진행바 (10칸) + 코인 예상 표시
+- [x] `/chuseok/claim` + `/chuseok/complete`
+- [x] 추석 테마 CSS
 
 ### QR·배포
-- [ ] `/chuseok/entry-qr` 진입 QR 인쇄
-- [ ] Vercel 배포 + Supabase seed
+- [x] `/chuseok/entry-qr` 진입 QR 인쇄
+- [x] Supabase migration + seed 완료
+- [ ] Vercel 배포 (`git push` 필요 — 권한 확인)
 - [ ] 실기기 HTTPS 카메라 테스트
 
 ### 관리자 (2차)
-- [ ] `/chuseok/admin` 비밀번호 인증
-- [ ] 퀴즈·정답·위치 CRUD API + UI
+- [x] `/chuseok/admin` 비밀번호 인증
+- [x] 퀴즈·정답·위치 CRUD API + UI
 
 ### 퀴즈 콘텐츠
 - [x] 퀴즈 1~10 초안 확정 (seed 반영)
 - [x] 정답 띄어쓰기·칸 표현 확정
-- [ ] seed 반영 (배포 시)
+- [x] seed 반영
 
 ---
 
