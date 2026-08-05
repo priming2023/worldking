@@ -13,168 +13,31 @@ function graphemes(text: string): string[] {
   return Array.from(text.normalize("NFC"));
 }
 
-function singleGrapheme(text: string): string {
-  const g = graphemes(text);
-  return g.length === 0 ? "" : (g[g.length - 1] ?? "");
-}
-
-/** 아직 조합 중인 자모(ㄱ, ㅂ 등) — 이때는 칸 이동하면 안 됨 */
-function isHangulJamo(ch: string): boolean {
-  if (!ch) return false;
-  const c = ch.codePointAt(0) ?? 0;
-  return (
-    (c >= 0x1100 && c <= 0x11ff) || // Hangul Jamo
-    (c >= 0x3130 && c <= 0x318f) || // Compatibility Jamo
-    (c >= 0xa960 && c <= 0xa97f) ||
-    (c >= 0xd7b0 && c <= 0xd7ff)
-  );
-}
-
-/** 네모칸 주관식 — 칸당 1글자, 한글 IME 조합 완료 후에만 다음 칸 */
+/**
+ * 네모칸은 표시만, 실제 입력은 투명한 단일 input.
+ * 칸마다 input을 두면 한글 첫 글자(보 등) 조합이 깨짐.
+ */
 export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
   const flatCount = display.reduce((s, g) => s + g.length, 0);
-  const [chars, setChars] = useState<string[]>(() => Array(flatCount).fill(""));
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  const composingRef = useRef(false);
-  /** compositionend 직후 blur로 빈 onChange가 와서 글자가 지워지는 것 방지 */
-  const ignoreEmptyChangeRef = useRef(false);
+  const [text, setText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setChars(Array(flatCount).fill(""));
-    inputsRef.current = [];
-    composingRef.current = false;
+    setText("");
+    // 퀴즈가 바뀌면 입력란에 포커스
+    requestAnimationFrame(() => inputRef.current?.focus());
   }, [flatCount, display]);
 
-  const focusAt = useCallback((index: number) => {
-    const el = inputsRef.current[index];
-    if (!el) return;
-    el.focus();
-  }, []);
-
-  const setCharAt = useCallback((flatIndex: number, ch: string) => {
-    setChars((prev) => {
-      const next = [...prev];
-      next[flatIndex] = ch;
-      return next;
-    });
-  }, []);
-
-  const commitOneAndAdvance = useCallback(
-    (flatIndex: number, raw: string) => {
-      const ch = singleGrapheme(raw.replace(/\s/g, ""));
-      setCharAt(flatIndex, ch);
-      if (!ch) return;
-      ignoreEmptyChangeRef.current = true;
-      window.setTimeout(() => {
-        ignoreEmptyChangeRef.current = false;
-      }, 50);
-      if (flatIndex < flatCount - 1) {
-        requestAnimationFrame(() => focusAt(flatIndex + 1));
-      }
-    },
-    [flatCount, focusAt, setCharAt],
-  );
-
-  /** 붙여넣기: 여러 글자를 칸에 순서대로 채움 */
-  const commitPaste = useCallback(
-    (flatIndex: number, raw: string) => {
-      const parts = graphemes(raw.replace(/\s/g, ""));
-      if (parts.length === 0) return;
-      setChars((prev) => {
-        const next = [...prev];
-        let i = flatIndex;
-        for (const p of parts) {
-          if (i >= flatCount) break;
-          next[i] = p;
-          i += 1;
-        }
-        return next;
-      });
-      const nextFocus = Math.min(flatIndex + parts.length, flatCount - 1);
-      ignoreEmptyChangeRef.current = true;
-      window.setTimeout(() => {
-        ignoreEmptyChangeRef.current = false;
-      }, 50);
-      requestAnimationFrame(() => focusAt(nextFocus));
-    },
-    [flatCount, focusAt],
-  );
-
-  const handleCompositionStart = useCallback(() => {
-    composingRef.current = true;
-  }, []);
-
-  const handleCompositionEnd = useCallback(
-    (flatIndex: number, e: React.CompositionEvent<HTMLInputElement>) => {
-      composingRef.current = false;
-      const raw = e.data || e.currentTarget.value || "";
-      commitOneAndAdvance(flatIndex, raw);
-    },
-    [commitOneAndAdvance],
-  );
+  const chars = graphemes(text.replace(/\s/g, "")).slice(0, flatCount);
 
   const handleChange = useCallback(
-    (flatIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-
-      if (composingRef.current) {
-        // 조합 중: 컨트롤드 인풋이 IME를 지우지 않도록 현재 값 유지 (1음절)
-        setCharAt(flatIndex, singleGrapheme(value) || value);
-        return;
-      }
-
-      // 포커스 이동 직후 빈 change → 무시 (보 가 지워지던 원인)
-      if (value === "") {
-        if (ignoreEmptyChangeRef.current) return;
-        return;
-      }
-
-      const parts = graphemes(value.replace(/\s/g, ""));
-
-      // compositionstart보다 change가 먼저 오는 경우(ㅂ만 입력됨) → 이동하지 않음
-      if (parts.length === 1 && isHangulJamo(parts[0]!)) {
-        setCharAt(flatIndex, parts[0]!);
-        return;
-      }
-
-      if (parts.length > 1) {
-        commitPaste(flatIndex, value);
-        return;
-      }
-
-      // 영문·숫자·이미 완성된 한글 1글자
-      commitOneAndAdvance(flatIndex, value);
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const next = graphemes(e.target.value.replace(/\s/g, ""))
+        .slice(0, flatCount)
+        .join("");
+      setText(next);
     },
-    [commitOneAndAdvance, commitPaste, setCharAt],
-  );
-
-  const handleKeyDown = useCallback(
-    (flatIndex: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (composingRef.current) return;
-
-      if (e.key === "Backspace") {
-        e.preventDefault();
-        if (chars[flatIndex]) {
-          setCharAt(flatIndex, "");
-          return;
-        }
-        if (flatIndex > 0) {
-          setCharAt(flatIndex - 1, "");
-          focusAt(flatIndex - 1);
-        }
-        return;
-      }
-
-      if (e.key === "ArrowLeft" && flatIndex > 0) {
-        e.preventDefault();
-        focusAt(flatIndex - 1);
-      }
-      if (e.key === "ArrowRight" && flatIndex < flatCount - 1) {
-        e.preventDefault();
-        focusAt(flatIndex + 1);
-      }
-    },
-    [chars, flatCount, focusAt, setCharAt],
+    [flatCount],
   );
 
   const handleSubmit = useCallback(
@@ -193,43 +56,61 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        {display.map((group, gi) => (
-          <div key={gi} className="flex items-center gap-3">
-            {gi > 0 && (
-              <span className="text-chuseok-gold/60 text-lg font-bold" aria-hidden>
-                ·
-              </span>
-            )}
-            <div className="flex gap-1.5">
-              {group.map((_, ci) => {
-                const i = flatIdx++;
-                return (
-                  <input
-                    key={`${gi}-${ci}`}
-                    ref={(el) => {
-                      inputsRef.current[i] = el;
-                    }}
-                    type="text"
-                    inputMode="text"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    value={chars[i] ?? ""}
-                    disabled={disabled}
-                    aria-label={`글자 ${i + 1}`}
-                    className="chuseok-box-input h-12 w-11 overflow-hidden rounded-lg border-2 border-chuseok-gold/50 bg-white/95 text-center text-xl font-bold text-chuseok-burgundy shadow-sm focus:border-chuseok-gold focus:outline-none focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50 sm:h-14 sm:w-12 sm:text-2xl"
-                    onChange={(e) => handleChange(i, e)}
-                    onCompositionStart={handleCompositionStart}
-                    onCompositionEnd={(e) => handleCompositionEnd(i, e)}
-                    onKeyDown={(e) => handleKeyDown(i, e)}
-                  />
-                );
-              })}
+      <div className="relative w-full max-w-sm">
+        {/* 표시용 네모칸 */}
+        <div className="pointer-events-none flex flex-wrap items-center justify-center gap-3 px-1 py-2">
+          {display.map((group, gi) => (
+            <div key={gi} className="flex items-center gap-3">
+              {gi > 0 && (
+                <span className="text-chuseok-gold/60 text-lg font-bold" aria-hidden>
+                  ·
+                </span>
+              )}
+              <div className="flex gap-1.5">
+                {group.map((_, ci) => {
+                  const i = flatIdx++;
+                  const filled = chars[i] ?? "";
+                  const isActive = i === Math.min(chars.length, flatCount - 1);
+                  return (
+                    <span
+                      key={`${gi}-${ci}`}
+                      className={`chuseok-box-input flex h-12 w-11 items-center justify-center overflow-hidden rounded-lg border-2 bg-white/95 text-xl font-bold text-chuseok-burgundy shadow-sm sm:h-14 sm:w-12 sm:text-2xl ${
+                        isActive
+                          ? "border-chuseok-gold ring-2 ring-chuseok-gold/30"
+                          : "border-chuseok-gold/50"
+                      }`}
+                    >
+                      {filled}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* 실제 입력 (투명 오버레이) — 한글 IME 정상 */}
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="text"
+          enterKeyHint="done"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          disabled={disabled}
+          value={text}
+          aria-label="정답 입력"
+          className="absolute inset-0 z-10 cursor-text bg-transparent text-transparent caret-chuseok-burgundy outline-none"
+          style={{ caretColor: "#8b2942" }}
+          onChange={handleChange}
+        />
       </div>
+
+      <p className="text-xs font-semibold text-chuseok-burgundy/60">
+        {chars.length}/{flatCount}글자
+      </p>
+
       <button
         type="submit"
         disabled={disabled}
