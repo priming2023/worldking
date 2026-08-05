@@ -1,5 +1,68 @@
 # 키즈카페 보물찾기 PWA — 프로젝트 plan.md
 
+## 보존 — 기존 QR보물찾기 (변경 금지)
+
+| 항목 | URL |
+|------|-----|
+| 앱 홈 | https://worldking-t86b.vercel.app/ |
+| QR 스캔 | https://worldking-t86b.vercel.app/scan |
+| 보물지도 | https://worldking-t86b.vercel.app/map |
+| QR 인쇄(20개) | https://worldking-t86b.vercel.app/print/treasure-qr-sheet.html |
+| 직원 인쇄 | https://worldking-t86b.vercel.app/staff/print-qr |
+| Git 보존 태그 | `treasure-hunt-v1` (2026-08-05 시점 스냅샷) |
+
+## 신규 — 추석QR보물미션
+
+| 항목 | URL |
+|------|-----|
+| 진입(게임설명+퀴즈1) | https://worldking-t86b.vercel.app/chuseok |
+| QR 스캔 | https://worldking-t86b.vercel.app/chuseok/scan |
+| 코인 수령 | https://worldking-t86b.vercel.app/chuseok/claim |
+| 진입 QR 인쇄 | https://worldking-t86b.vercel.app/chuseok/entry-qr |
+| 관리자 | https://worldking-t86b.vercel.app/chuseok/admin |
+
+---
+
+## 추석QR보물미션 개발 체크리스트
+
+### 보존
+- [x] Git tag `treasure-hunt-v1` 생성
+- [x] plan.md 최상단 기존 QR보물찾기 URL 기록
+- [ ] 기존 `/`, `/api/*` 코드 diff 없음 확인
+
+### DB·API
+- [ ] MissionStep / MissionProgress / MissionScan / MissionClaim migration
+- [ ] 10개 위치 + 퀴즈 seed
+- [ ] GET `/api/chuseok/me`
+- [ ] POST `/api/chuseok/quiz`
+- [ ] POST `/api/chuseok/scan` (순서 경고·무순서 전환)
+- [ ] POST `/api/chuseok/claim` (하루 1회)
+
+### UI
+- [ ] `/chuseok` 게임 설명 + 퀴즈 1
+- [ ] QuizInput 네모칸 (띄어쓰기 표현)
+- [ ] 정답 시 위치 안내 문구
+- [ ] `/chuseok/scan` + OrderWarningModal
+- [ ] 진행바 (10칸) + 코인 예상 표시
+- [ ] `/chuseok/claim` + `/chuseok/complete`
+- [ ] 추석 테마 CSS
+
+### QR·배포
+- [ ] `/chuseok/entry-qr` 진입 QR 인쇄
+- [ ] Vercel 배포 + Supabase seed
+- [ ] 실기기 HTTPS 카메라 테스트
+
+### 관리자 (2차)
+- [ ] `/chuseok/admin` 비밀번호 인증
+- [ ] 퀴즈·정답·위치 CRUD API + UI
+
+### 퀴즈 콘텐츠
+- [x] 퀴즈 1~10 초안 확정 (seed 반영)
+- [x] 정답 띄어쓰기·칸 표현 확정
+- [ ] seed 반영 (배포 시)
+
+---
+
 ## 목표
 
 - 키즈카페에 숨긴 QR 20개를 스캔해 보물(코인)을 모으는 PWA.

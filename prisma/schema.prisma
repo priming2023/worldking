@@ -46,3 +46,60 @@ model Claim {
   @@unique([deviceId, claimDateKst])
   @@index([deviceId])
 }
+
+/// 추석 QR 보물미션 — 퀴즈·위치 단계 (관리자 편집 가능)
+model MissionStep {
+  id            Int      @id @default(autoincrement())
+  stepOrder     Int      @unique
+  question      String
+  answer        String
+  /// JSON: [["송","편"]] or [["윷"],["놀이"]] — UI 네모칸
+  answerDisplay String
+  locationHint  String
+  qrCode        String
+  updatedAt     DateTime @updatedAt
+}
+
+/// 추석 미션 일별 진행 (KST)
+model MissionProgress {
+  id              String   @id @default(cuid())
+  deviceId        String
+  scanDateKst     String
+  /// true = 순서 모드(2배 코인 도전), false = 무순서 모드
+  orderedMode     Boolean  @default(true)
+  /// 맞춘 퀴즈 수 (0~10)
+  quizzesPassed   Int      @default(0)
+  /// quiz | scan — 현재 단계에서 할 일
+  phase           String   @default("quiz")
+  /// 순서 모드: 스캔 대기 중인 QR 코드 (예: WK01)
+  awaitingScanCode String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([deviceId, scanDateKst])
+  @@index([deviceId])
+}
+
+model MissionScan {
+  id            String   @id @default(cuid())
+  deviceId      String
+  code          String
+  scanDateKst   String
+  scannedAt     DateTime @default(now())
+  sequenceIndex Int
+
+  @@unique([deviceId, code, scanDateKst])
+  @@index([deviceId, scanDateKst])
+}
+
+model MissionClaim {
+  id           String   @id @default(cuid())
+  deviceId     String
+  claimDateKst String
+  coinAmount   Int
+  rewardMode   String
+  createdAt    DateTime @default(now())
+
+  @@unique([deviceId, claimDateKst])
+  @@index([deviceId])
+}
