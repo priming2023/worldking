@@ -14,24 +14,16 @@ type Step = {
 };
 
 export default function ChuseokAdminPage() {
-  const [password, setPassword] = useState("");
-  const [authed, setAuthed] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  const authHeaders = useCallback(
-    () => ({ "Content-Type": "application/json", "x-admin-password": password }),
-    [password],
-  );
-
   const loadSteps = useCallback(async () => {
     setLoading(true);
+    setErr(null);
     try {
-      const res = await fetch("/api/chuseok/admin/steps", {
-        headers: { "x-admin-password": password },
-      });
+      const res = await fetch("/api/chuseok/admin/steps");
       if (!res.ok) {
         setErr("불러오기 실패");
         return;
@@ -43,30 +35,18 @@ export default function ChuseokAdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [password]);
+  }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null);
-    const res = await fetch("/api/chuseok/admin/steps", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-    if (!res.ok) {
-      setErr("비밀번호가 틀렸어요.");
-      return;
-    }
-    setAuthed(true);
-    await loadSteps();
-  };
+  useEffect(() => {
+    void loadSteps();
+  }, [loadSteps]);
 
   const saveStep = async (step: Step) => {
     setMsg(null);
     setErr(null);
     const res = await fetch("/api/chuseok/admin/steps", {
       method: "PUT",
-      headers: authHeaders(),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stepOrder: step.stepOrder,
         question: step.question,
@@ -91,34 +71,6 @@ export default function ChuseokAdminPage() {
     });
   };
 
-  if (!authed) {
-    return (
-      <main className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-10">
-        <Link href="/chuseok" className="text-chuseok-burgundy font-bold">
-          ← 미션 홈
-        </Link>
-        <h1 className="chuseok-title text-2xl font-extrabold text-chuseok-burgundy">
-          관리자
-        </h1>
-        <form onSubmit={(e) => void handleLogin(e)} className="chuseok-card flex flex-col gap-3 rounded-2xl p-5">
-          <label className="text-sm font-bold text-chuseok-burgundy">
-            비밀번호
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-xl border-2 border-chuseok-gold/40 px-3 py-2"
-            />
-          </label>
-          <button type="submit" className="chuseok-btn-primary rounded-xl py-2 font-bold">
-            로그인
-          </button>
-          {err && <p className="text-sm text-red-700">{err}</p>}
-        </form>
-      </main>
-    );
-  }
-
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-8 pb-16">
       <div className="flex items-center justify-between">
@@ -129,6 +81,10 @@ export default function ChuseokAdminPage() {
           미션 홈
         </Link>
       </div>
+
+      <p className="text-sm text-chuseok-burgundy/70">
+        링크를 아는 사람이 바로 수정할 수 있어요. 직원용으로만 공유해 주세요.
+      </p>
 
       {loading && <p className="text-sm">불러오는 중…</p>}
       {msg && <p className="text-sm font-bold text-emerald-700">{msg}</p>}

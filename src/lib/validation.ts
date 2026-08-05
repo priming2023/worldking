@@ -29,10 +29,6 @@ export const chuseokScanBodySchema = z.object({
   confirmOutOfOrder: z.boolean().optional(),
 });
 
-export const chuseokAdminAuthSchema = z.object({
-  password: z.string().min(1),
-});
-
 export const chuseokStepUpdateSchema = z.object({
   stepOrder: z.number().int().min(1).max(10),
   question: z.string().min(1).max(500),
