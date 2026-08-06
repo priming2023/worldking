@@ -16,7 +16,8 @@
 | QR 스캔 | https://worldking-t86b.vercel.app/halloween/scan |
 | 코인 수령 | https://worldking-t86b.vercel.app/halloween/claim |
 | 진입 QR 인쇄 | https://worldking-t86b.vercel.app/halloween/entry-qr |
-| 관리자 | https://worldking-t86b.vercel.app/admin2 |
+| 관리자 | https://worldking-t86b.vercel.app/halloween/admin |
+| 관리자(구 주소) | https://worldking-t86b.vercel.app/admin2 → `/halloween/admin` 로 이동 |
 
 ## 규칙 요약
 
@@ -25,7 +26,7 @@
 - 보상: 순서+퀴즈 10완주 **20코인** / 무순서 10개 **10코인** / 5개↑ 부분수령 / **하루 1회**
 - 순서 포기 시: 퀴즈 중단, QR만 / x2 찬스 소멸
 - 직원 확인 PIN: **1001** (`HALLOWEEN_STAFF_PIN` 또는 `CHUSEOK_STAFF_PIN`)
-- 관리자 `/admin2`: 오픈형(링크 아는 사람만)
+- 관리자 `/halloween/admin`: 오픈형(링크 아는 사람만). `/admin2`는 여기로 이동.
 
 ## 퀴즈 초안 (시드)
 
@@ -64,7 +65,7 @@
 - [x] 할로윈 테마 (주황·보라·검정, 호박/박쥐/유령)
 
 ### 관리자
-- [x] `/admin2` 퀴즈·위치 편집
+- [x] `/halloween/admin` 퀴즈·위치 편집 (`/admin2` → 리다이렉트)
 
 ### 배포
 - [x] migrate + seed
