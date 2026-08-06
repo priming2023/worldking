@@ -164,9 +164,9 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
               onSubmit={handleQuizSubmit}
               disabled={submitting}
               countLabel={
-                data.currentQuiz.stepOrder === 3 ? "숫자3개" : undefined
+                data.currentQuiz.stepOrder === 4 ? "숫자3개" : undefined
               }
-              numeric={data.currentQuiz.stepOrder === 3}
+              numeric={data.currentQuiz.stepOrder === 4}
             />
           </div>
           {quizErr && (

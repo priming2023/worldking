@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "stepOrder": 1,
+    "question": "추석에 먹는 대표적인 둥근 모양의 떡은 무엇일까요?",
+    "answer": "송편",
+    "answerDisplay": "[[\"송\",\"편\"]]",
+    "locationHint": "🏁 레이스장",
+    "qrCode": "WK01",
+    "updatedAt": "2026-08-06T12:08:28.625Z"
+  },
+  {
+    "id": 2,
+    "stepOrder": 2,
+    "question": "네 개의 막대를 던져서 하는 전통 놀이는 무엇일까요?",
+    "answer": "윷놀이",
+    "answerDisplay": "[[\"윷\",\"놀\",\"이\"]]",
+    "locationHint": "🩹 정수기 근처 구급함",
+    "qrCode": "WK02",
+    "updatedAt": "2026-08-06T12:09:54.284Z"
+  },
+  {
+    "id": 3,
+    "stepOrder": 3,
+    "question": "추석 밤에 뜨는 둥근 달은?",
+    "answer": "보름달",
+    "answerDisplay": "[[\"보\",\"름\",\"달\"]]",
+    "locationHint": "🚻 화장실 앞 (안으로 들어가진 않아요.)",
+    "qrCode": "WK03",
+    "updatedAt": "2026-08-06T12:11:27.484Z"
+  },
+  {
+    "id": 4,
+    "stepOrder": 4,
+    "question": "추석은 음력 O월 OO일 일까요?",
+    "answer": "815",
+    "answerDisplay": "[[\"8\",\"1\",\"5\"]]",
+    "locationHint": "🦕 공룡게임기",
+    "qrCode": "WK04",
+    "updatedAt": "2026-08-06T12:12:20.204Z"
+  },
+  {
+    "id": 5,
+    "stepOrder": 5,
+    "question": "추석을 한자어로 부를 때 자주 쓰는 이름은 무엇일까요?",
+    "answer": "한가위",
+    "answerDisplay": "[[\"한\",\"가\",\"위\"]]",
+    "locationHint": "📋 2층 이용안내",
+    "qrCode": "WK05",
+    "updatedAt": "2026-08-06T12:17:51.389Z"
+  },
+  {
+    "id": 6,
+    "stepOrder": 6,
+    "question": "해충을 없애고 풍년을 기원하며 불을 놓던 정월대보름 전통놀이는 무엇일까요?",
+    "answer": "쥐불놀이",
+    "answerDisplay": "[[\"쥐\",\"불\",\"놀\",\"이\"]]",
+    "locationHint": "🚒 119기둥",
+    "qrCode": "WK06",
+    "updatedAt": "2026-08-06T12:16:32.623Z"
+  },
+  {
+    "id": 7,
+    "stepOrder": 7,
+    "question": "발로만 차서 떨어뜨리지 않고 오래하는 놀이는 무엇일까요?",
+    "answer": "제기차기",
+    "answerDisplay": "[[\"제\",\"기\",\"차\",\"기\"]]",
+    "locationHint": "🧸 Toy창틀",
+    "qrCode": "WK07",
+    "updatedAt": "2026-08-06T12:15:36.878Z"
+  },
+  {
+    "id": 8,
+    "stepOrder": 8,
+    "question": "추석에 조상님께 감사드리는 아침에 드리는 제사를 무엇이라고 할까요?",
+    "answer": "차례",
+    "answerDisplay": "[[\"차\",\"례\"]]",
+    "locationHint": "📸 photo앞",
+    "qrCode": "WK08",
+    "updatedAt": "2026-08-06T12:13:31.422Z"
+  },
+  {
+    "id": 9,
+    "stepOrder": 9,
+    "question": "추석 밤, 둥근 달 아래에서 손을 잡고 빙글빙글 원을 그리며 노는 전통놀이는 무엇일까요?",
+    "answer": "강강술래",
+    "answerDisplay": "[[\"강\",\"강\",\"술\",\"래\"]]",
+    "locationHint": "🤖 AI사진관 근처",
+    "qrCode": "WK09",
+    "updatedAt": "2026-08-06T12:14:09.712Z"
+  },
+  {
+    "id": 10,
+    "stepOrder": 10,
+    "question": "추석에 온 가족이 함께 와서 신나게 놀 수 있는 놀이동산은 어디일까요?",
+    "answer": "월드킹",
+    "answerDisplay": "[[\"월\",\"드\",\"킹\"]]",
+    "locationHint": "🛗 2층 엘레베이터 앞",
+    "qrCode": "WK10",
+    "updatedAt": "2026-08-06T12:06:42.781Z"
+  }
+]

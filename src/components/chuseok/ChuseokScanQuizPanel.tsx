@@ -34,8 +34,8 @@ export function ChuseokScanQuizPanel({
           display={answerDisplay}
           onSubmit={onSubmit}
           disabled={submitting}
-          countLabel={stepOrder === 3 ? "숫자3개" : undefined}
-          numeric={stepOrder === 3}
+          countLabel={stepOrder === 4 ? "숫자3개" : undefined}
+          numeric={stepOrder === 4}
         />
       </div>
       {error && (
