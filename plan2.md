@@ -69,4 +69,4 @@
 ### 배포
 - [x] migrate + seed
 - [x] 진입 QR PNG (`public/print/halloween-entry-qr.png`)
-- [ ] Vercel prod 배포
+- [x] Vercel prod 배포
