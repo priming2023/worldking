@@ -17,6 +17,12 @@ export const chuseokDeviceSchema = z.object({
   deviceId: z.string().uuid(),
 });
 
+export const chuseokClaimBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  /** 카운터 직원 확인 PIN */
+  staffPin: z.string().min(1).max(32),
+});
+
 export const chuseokQuizBodySchema = z.object({
   deviceId: z.string().uuid(),
   answer: z.string().min(1).max(100),

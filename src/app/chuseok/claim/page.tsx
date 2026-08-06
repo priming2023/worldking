@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ChuseokModal } from "@/components/chuseok/ChuseokModal";
+import { StaffPinModal } from "@/components/chuseok/StaffPinModal";
 import { useChuseokDeviceId } from "@/hooks/chuseok/useChuseokDeviceId";
 import { useChuseokMe } from "@/hooks/chuseok/useChuseokMe";
 import { CLAIM_MIN } from "@/lib/chuseok/reward";
@@ -19,12 +20,13 @@ export default function ChuseokClaimPage() {
   const { data, loading, error, refresh } = useChuseokMe(deviceId);
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [pinOpen, setPinOpen] = useState(false);
   const [claimErr, setClaimErr] = useState<string | null>(null);
 
   const count = data?.foundCount ?? 0;
   const coins = data?.expectedCoins ?? 0;
 
-  async function confirmClaim() {
+  async function confirmClaim(staffPin: string) {
     if (!deviceId) return;
     setBusy(true);
     setClaimErr(null);
@@ -32,7 +34,7 @@ export default function ChuseokClaimPage() {
       const res = await fetch("/api/chuseok/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId }),
+        body: JSON.stringify({ deviceId, staffPin }),
       });
       const json = (await res.json()) as {
         ok?: boolean;
@@ -40,12 +42,19 @@ export default function ChuseokClaimPage() {
         dateDisplay?: string;
         coinAmount?: number;
         praise?: string;
+        error?: string;
       };
       if (!res.ok) {
+        if (json.error === "invalid_staff_pin") {
+          setClaimErr(json.message ?? "직원 비밀번호가 틀렸어요.");
+          return;
+        }
+        setPinOpen(false);
         setClaimErr(json.message ?? "코인 받기에 실패했어요.");
         await refresh();
         return;
       }
+      setPinOpen(false);
       sessionStorage.setItem("worldking_chuseok_last_claim", JSON.stringify(json));
       router.push("/chuseok/gift");
     } catch {
@@ -162,11 +171,14 @@ export default function ChuseokClaimPage() {
             <button
               type="button"
               disabled={busy}
-              onClick={() => void confirmClaim()}
+              onClick={() => {
+                setClaimErr(null);
+                setPinOpen(true);
+              }}
               className={primaryBtn}
             >
-              <span>{busy ? "처리 중…" : "네, 받을게요!"}</span>
-              {!busy && <span aria-hidden>🎊</span>}
+              <span>네, 받을게요!</span>
+              <span aria-hidden>🎊</span>
             </button>
             <Link href="/chuseok/scan?auto=1" className={secondaryBtn}>
               <span aria-hidden>👋</span>
@@ -177,8 +189,20 @@ export default function ChuseokClaimPage() {
         </section>
       )}
 
+      <StaffPinModal
+        open={pinOpen}
+        busy={busy}
+        error={pinOpen ? claimErr : null}
+        onClose={() => {
+          if (busy) return;
+          setPinOpen(false);
+          setClaimErr(null);
+        }}
+        onConfirm={(pin) => void confirmClaim(pin)}
+      />
+
       <ChuseokModal
-        open={Boolean(claimErr)}
+        open={Boolean(claimErr) && !pinOpen}
         title="안내"
         onClose={() => setClaimErr(null)}
         primaryLabel="알겠어요"

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { estimateReward } from "@/lib/chuseok/reward";
+import { isValidChuseokStaffPin } from "@/lib/chuseok/staff-pin";
 import {
   ensureDevice,
   getMissionScans,
@@ -7,15 +8,26 @@ import {
 } from "@/lib/chuseok/db";
 import { kstTodayDisplay, kstTodayString } from "@/lib/kst";
 import { prisma } from "@/lib/prisma";
-import { chuseokDeviceSchema } from "@/lib/validation";
+import { chuseokClaimBodySchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
-  const parsed = chuseokDeviceSchema.safeParse(json);
+  const parsed = chuseokClaimBodySchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid_body" }, { status: 400 });
   }
-  const { deviceId } = parsed.data;
+  const { deviceId, staffPin } = parsed.data;
+
+  if (!isValidChuseokStaffPin(staffPin)) {
+    return NextResponse.json(
+      {
+        error: "invalid_staff_pin",
+        message: "직원 비밀번호가 틀렸어요. 다시 입력해 주세요.",
+      },
+      { status: 401 },
+    );
+  }
+
   const claimDateKst = kstTodayString();
 
   await ensureDevice(deviceId);
