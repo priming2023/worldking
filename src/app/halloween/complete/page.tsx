@@ -44,7 +44,7 @@ export default function HalloweenCompletePage() {
         )}
         <Link
           href="/halloween"
-          className="flex min-h-12 items-center justify-center rounded-2xl border-2 border-halloween-gold/40 font-bold text-halloween-burgundy"
+          className="halloween-btn-secondary flex min-h-12 items-center justify-center rounded-2xl font-bold"
         >
           홈으로
         </Link>

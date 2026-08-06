@@ -13,7 +13,7 @@ import { MISSION_TOTAL } from "@/lib/halloween/codes";
 const primaryBtn =
   "halloween-btn-primary flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl py-4 text-lg font-extrabold disabled:opacity-60 active:scale-[0.99]";
 const secondaryBtn =
-  "flex w-full min-h-12 flex-wrap items-center justify-center gap-2 rounded-2xl border-2 border-halloween-gold/40 bg-white px-3 py-3 text-center text-base font-bold text-halloween-burgundy hover:bg-white/80";
+  "halloween-btn-secondary flex w-full min-h-12 flex-wrap items-center justify-center gap-2 rounded-2xl px-3 py-3 text-center text-base font-bold";
 
 export default function HalloweenClaimPage() {
   const deviceId = useHalloweenDeviceId();
@@ -79,7 +79,7 @@ export default function HalloweenClaimPage() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/halloween"
-          className="inline-flex min-h-12 items-center rounded-2xl border-2 border-halloween-gold/40 bg-white px-4 text-base font-extrabold text-halloween-burgundy shadow-sm"
+          className="halloween-btn-secondary inline-flex min-h-12 items-center rounded-2xl px-4 text-base font-extrabold shadow-sm"
         >
           ← 홈
         </Link>

@@ -71,7 +71,7 @@ export function HalloweenScanResultModals({
             {allFound && (
               <Link
                 href="/halloween/complete"
-                className="flex min-h-12 items-center justify-center rounded-2xl border-2 border-halloween-gold/50 bg-white text-lg font-bold text-halloween-burgundy"
+                className="halloween-btn-secondary flex min-h-12 items-center justify-center rounded-2xl text-lg font-bold"
               >
                 축하 화면 보기 🎉
               </Link>

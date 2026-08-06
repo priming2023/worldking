@@ -32,7 +32,7 @@ export function OrderWarningModal({
           <button
             type="button"
             onClick={onConfirm}
-            className="min-h-12 w-full rounded-2xl border-2 border-halloween-gold/40 bg-white py-3 text-base font-bold text-halloween-burgundy/80"
+            className="halloween-btn-secondary min-h-12 w-full rounded-2xl py-3 text-base font-bold"
           >
             그래도 스캔하기 (순서 포기)
           </button>

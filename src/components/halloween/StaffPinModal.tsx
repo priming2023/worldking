@@ -66,7 +66,7 @@ export function StaffPinModal({
             type="button"
             disabled={busy}
             onClick={onClose}
-            className="min-h-11 w-full rounded-2xl border-2 border-halloween-gold/40 bg-white text-base font-bold text-halloween-burgundy disabled:opacity-60"
+            className="halloween-btn-secondary min-h-11 w-full rounded-2xl text-base font-bold disabled:opacity-60"
           >
             취소
           </button>
@@ -94,7 +94,7 @@ export function StaffPinModal({
             if (e.key === "Enter") submit();
           }}
           placeholder="비밀번호"
-          className="mt-1 w-full rounded-2xl border-2 border-halloween-gold/40 bg-white px-4 py-3 text-center text-2xl font-extrabold tracking-[0.35em] text-halloween-burgundy outline-none focus:border-halloween-burgundy"
+          className="mt-1 w-full rounded-2xl border-2 border-halloween-gold/50 bg-[#1a0b2e] px-4 py-3 text-center text-2xl font-extrabold tracking-[0.35em] text-white outline-none focus:border-halloween-gold"
         />
       </label>
       {showErr && (

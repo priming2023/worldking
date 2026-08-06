@@ -13,7 +13,7 @@
 }
 
 .text-halloween-burgundy {
-  color: #e9d5ff;
+  color: #f3e8ff;
 }
 
 .text-halloween-gold {
@@ -70,10 +70,11 @@
   color: #faf5ff;
 }
 
+/* 추석 burgundy 버튼처럼 — 진한 보라 + 흰 글씨 */
 .halloween-btn-primary {
-  background: linear-gradient(135deg, #ea580c, #7c3aed);
-  color: #fff7ed;
-  box-shadow: 0 4px 16px rgb(249 115 22 / 0.4);
+  background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgb(91 33 182 / 0.55);
 }
 
 .halloween-btn-primary:hover {
@@ -84,10 +85,28 @@
   transform: scale(0.99);
 }
 
+/* 보조 버튼 — 흰 배경 대신 보라톤 + 흰 글씨, 주황 테두리 */
+.halloween-btn-secondary {
+  background: linear-gradient(135deg, #6d28d9, #4c1d95);
+  color: #ffffff;
+  border: 2px solid rgb(251 146 60 / 0.75);
+  box-shadow: 0 3px 12px rgb(0 0 0 / 0.35);
+}
+
+.halloween-btn-secondary:hover {
+  filter: brightness(1.1);
+}
+
+.halloween-btn-secondary:active {
+  transform: scale(0.99);
+}
+
+/* 그믐달(초승달) — 보름달과 구분 */
 .halloween-moon {
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff7ed, #fb923c 55%, rgb(124 58 237 / 0.4));
-  box-shadow: 0 0 40px rgb(249 115 22 / 0.45);
+  background: transparent;
+  box-shadow: inset -1.35rem 0 0 0 #fde68a;
+  filter: drop-shadow(0 0 18px rgb(253 230 138 / 0.55));
 }
 
 .halloween-box-input {
@@ -98,35 +117,49 @@
 }
 
 .halloween-deco {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
   user-select: none;
-  opacity: 0.55;
-  font-size: 1.75rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55));
   animation: halloween-float 6s ease-in-out infinite;
+  z-index: 1;
 }
 
 .halloween-deco-bat {
+  font-size: 2.25rem;
+  opacity: 0.85;
   animation-duration: 4.5s;
 }
 
 .halloween-deco-ghost {
+  font-size: 3.5rem;
+  opacity: 0.92;
   animation-duration: 7s;
   animation-delay: 0.8s;
 }
 
 .halloween-deco-pumpkin {
+  font-size: 3.75rem;
+  opacity: 0.95;
   animation-duration: 5.5s;
   animation-delay: 1.4s;
+}
+
+.halloween-deco-ghost-sm {
+  font-size: 2.5rem;
+  opacity: 0.8;
+  animation-duration: 6.2s;
+  animation-delay: 0.3s;
 }
 
 @keyframes halloween-float {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(-2deg);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-14px) rotate(3deg);
   }
 }
 

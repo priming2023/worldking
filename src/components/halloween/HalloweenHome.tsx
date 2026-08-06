@@ -206,7 +206,7 @@ export function HalloweenHome({ deviceId }: HalloweenHomeProps) {
         {data?.orderedMode && !data?.missionComplete && data.phase === "quiz" && (
           <Link
             href="/halloween/scan?auto=1"
-            className="flex min-h-12 items-center justify-center rounded-2xl border-2 border-halloween-gold/40 bg-white/90 text-base font-bold text-halloween-burgundy"
+            className="halloween-btn-secondary flex min-h-12 items-center justify-center rounded-2xl text-base font-bold"
           >
             📷 미션 QR만 찾기 (x2 찬스 포기)
           </Link>

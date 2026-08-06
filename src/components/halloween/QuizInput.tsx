@@ -123,7 +123,7 @@ export function QuizInput({
           disabled={disabled}
           value={text}
           placeholder={numeric ? "숫자로 입력하세요" : "여기에 정답을 입력하세요"}
-          className="min-h-14 w-full rounded-2xl border-2 border-halloween-gold/60 bg-white px-4 py-3 text-center text-lg font-bold text-halloween-burgundy shadow-sm outline-none placeholder:font-semibold placeholder:text-halloween-burgundy/35 focus:border-halloween-gold focus:ring-2 focus:ring-halloween-gold/30 disabled:opacity-50"
+          className="min-h-14 w-full rounded-2xl border-2 border-halloween-gold/60 bg-[#1a0b2e] px-4 py-3 text-center text-lg font-bold text-white shadow-sm outline-none placeholder:font-semibold placeholder:text-white/40 focus:border-halloween-gold focus:ring-2 focus:ring-halloween-gold/30 disabled:opacity-50"
           style={{ fontSize: "16px" }}
           onChange={handleChange}
           onCompositionStart={handleCompositionStart}

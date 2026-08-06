@@ -106,7 +106,7 @@ function HalloweenScanInner({ deviceId }: Props) {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/halloween"
-          className="inline-flex min-h-11 items-center rounded-2xl border-2 border-halloween-gold/40 bg-white px-4 text-base font-extrabold text-halloween-burgundy shadow-sm"
+          className="halloween-btn-secondary inline-flex min-h-11 items-center rounded-2xl px-4 text-base font-extrabold shadow-sm"
         >
           ← 미션 홈
         </Link>
@@ -183,7 +183,7 @@ function HalloweenScanInner({ deviceId }: Props) {
             type="button"
             onClick={() => scannerRef.current?.flipCamera()}
             disabled={flipMeta.flipDisabled}
-            className="absolute right-2 top-2 z-10 rounded-lg border border-halloween-gold/40 bg-white/95 px-2 py-1 text-xs font-bold text-halloween-burgundy disabled:opacity-50"
+            className="absolute right-2 top-2 z-10 rounded-lg border border-halloween-gold/50 bg-[#4c1d95]/95 px-2 py-1 text-xs font-bold text-white disabled:opacity-50"
           >
             {flipMeta.flipLabel}
           </button>
