@@ -21,6 +21,16 @@ export async function POST(request: Request) {
   await ensureDevice(deviceId);
   const progress = await getOrCreateMissionProgress(deviceId);
 
+  if (!progress.orderedMode) {
+    return NextResponse.json(
+      {
+        error: "unordered_mode",
+        message: "순서 모드가 아니에요. 미션 QR만 찾아 주세요!",
+      },
+      { status: 400 },
+    );
+  }
+
   if (progress.phase !== "quiz") {
     return NextResponse.json(
       { error: "not_quiz_phase", message: "지금은 QR을 찾을 차례예요!" },

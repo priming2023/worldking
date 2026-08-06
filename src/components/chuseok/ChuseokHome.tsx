@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChuseokProgressBar } from "@/components/chuseok/ChuseokProgressBar";
 import { ChuseokIntro } from "@/components/chuseok/ChuseokIntro";
+import { ChuseokUnorderedExplore } from "@/components/chuseok/ChuseokUnorderedExplore";
 import { QuizInput } from "@/components/chuseok/QuizInput";
 import { useChuseokMe } from "@/hooks/chuseok/useChuseokMe";
 import { MISSION_TOTAL } from "@/lib/chuseok/codes";
@@ -126,7 +127,11 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
-      {!introVisible && !correctFlash && data?.phase === "scan" && data.locationHint && (
+      {!introVisible &&
+        !correctFlash &&
+        data?.orderedMode &&
+        data.phase === "scan" &&
+        data.locationHint && (
         <section className="chuseok-card-highlight rounded-3xl p-5 text-center">
           <p className="text-sm font-bold text-chuseok-gold">보물 위치</p>
           <p className="mt-2 text-xl font-extrabold text-chuseok-burgundy">
@@ -141,7 +146,11 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
-      {!introVisible && !correctFlash && data?.phase === "quiz" && data.currentQuiz && (
+      {!introVisible &&
+        !correctFlash &&
+        data?.orderedMode &&
+        data.phase === "quiz" &&
+        data.currentQuiz && (
         <section className="chuseok-card rounded-3xl p-5">
           <p className="text-sm font-bold text-chuseok-gold">
             퀴즈 {data.currentQuiz.stepOrder} / {MISSION_TOTAL}
@@ -168,6 +177,11 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
         </section>
       )}
 
+      {!introVisible &&
+        !correctFlash &&
+        !data?.orderedMode &&
+        !data?.missionComplete && <ChuseokUnorderedExplore />}
+
       {!introVisible && data?.missionComplete && (
         <section className="chuseok-card-highlight rounded-3xl p-5 text-center">
           <p className="text-xl font-extrabold text-chuseok-burgundy">모든 보물을 찾았어요! 🎉</p>
@@ -189,12 +203,12 @@ export function ChuseokHome({ deviceId }: ChuseokHomeProps) {
             🪙 코인 받기 ({expectedCoins}개)
           </Link>
         )}
-        {!data?.orderedMode && !data?.missionComplete && (
+        {data?.orderedMode && !data?.missionComplete && data.phase === "quiz" && (
           <Link
             href="/chuseok/scan?auto=1"
             className="flex min-h-12 items-center justify-center rounded-2xl border-2 border-chuseok-gold/40 bg-white/90 text-base font-bold text-chuseok-burgundy"
           >
-            📷 미션 QR만 찾기 (순서 보너스 없음)
+            📷 미션 QR만 찾기 (x2 찬스 포기)
           </Link>
         )}
         {data?.claimedToday && (

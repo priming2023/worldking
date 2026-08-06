@@ -37,14 +37,19 @@ export function afterCorrectScan(state: ProgressState): ProgressState {
   };
 }
 
-/** 무순서 모드 전환 */
+/** 무순서 모드 전환 — 퀴즈 중단, QR만 찾기 */
 export function switchToUnordered(state: ProgressState): ProgressState {
-  return { ...state, orderedMode: false };
+  return {
+    ...state,
+    orderedMode: false,
+    phase: "scan",
+    awaitingScanCode: null,
+  };
 }
 
 /** 첫 스캔이 퀴즈 없이 — 무순서 모드 (경고 없음) */
 export function startUnorderedFromScan(state: ProgressState): ProgressState {
-  return { ...state, orderedMode: false };
+  return switchToUnordered(state);
 }
 
 export function isMissionComplete(quizzesPassed: number, scanCount: number): boolean {
@@ -52,6 +57,8 @@ export function isMissionComplete(quizzesPassed: number, scanCount: number): boo
 }
 
 export function currentQuizStep(state: ProgressState): number | null {
+  // 순서 모드에서만 퀴즈 진행
+  if (!state.orderedMode) return null;
   if (state.phase !== "quiz") return null;
   const next = state.quizzesPassed + 1;
   if (next > MISSION_TOTAL) return null;

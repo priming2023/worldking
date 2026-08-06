@@ -39,8 +39,11 @@ function ChuseokScanInner({ deviceId }: Props) {
   const { data, refresh } = useChuseokMe(deviceId);
   const scan = useChuseokScanHandler(deviceId, refresh);
 
-  // 퀴즈 중에도 카메라 스트림 유지(권한 재요청 방지). 디코딩만 무시.
-  const inQuizPhase = data?.phase === "quiz" && Boolean(data.currentQuiz);
+  // 순서 모드 퀴즈 중에만 카메라 UI 가림 (스트림은 유지). 무순서는 퀴즈 없음.
+  const inQuizPhase =
+    Boolean(data?.orderedMode) &&
+    data?.phase === "quiz" &&
+    Boolean(data.currentQuiz);
   const showScanUi = !inQuizPhase && !correctFlash;
 
   useLayoutEffect(() => {

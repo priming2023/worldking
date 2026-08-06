@@ -48,7 +48,7 @@ export async function GET(request: Request) {
   });
 
   let currentQuiz = null;
-  if (quizStepNum !== null) {
+  if (progress.orderedMode && quizStepNum !== null) {
     const step = steps.find((s) => s.stepOrder === quizStepNum);
     if (step) {
       currentQuiz = {
@@ -60,15 +60,18 @@ export async function GET(request: Request) {
   }
 
   let locationHint: string | null = null;
-  if (progress.phase === "scan" && progress.awaitingScanCode) {
+  if (
+    progress.orderedMode &&
+    progress.phase === "scan" &&
+    progress.awaitingScanCode
+  ) {
     const stepOrder = progress.quizzesPassed;
     const step = steps.find((s) => s.stepOrder === stepOrder);
     locationHint = step?.locationHint ?? null;
   }
 
-  const missionComplete =
-    scans.length >= MISSION_TOTAL &&
-    progress.quizzesPassed >= MISSION_TOTAL;
+  // 무순서 모드는 QR 10개만 찾으면 완료 (퀴즈 불필요)
+  const missionComplete = scans.length >= MISSION_TOTAL;
 
   return NextResponse.json({
     foundCount: scans.length,

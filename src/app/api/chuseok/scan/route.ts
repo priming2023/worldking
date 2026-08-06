@@ -66,10 +66,15 @@ export async function POST(request: Request) {
       progress.quizzesPassed === 0 && progress.phase === "quiz";
 
     if (isFirstScanWithoutQuiz) {
-      // 퀴즈 없이 스캔 시작 → 무순서 모드
+      // 퀴즈 없이 스캔 시작 → 무순서 모드 (이후 퀴즈 없음)
+      const next = startUnorderedFromScan(state);
       progress = await prisma.missionProgress.update({
         where: { id: progress.id },
-        data: { orderedMode: startUnorderedFromScan(state).orderedMode },
+        data: {
+          orderedMode: next.orderedMode,
+          phase: next.phase,
+          awaitingScanCode: next.awaitingScanCode,
+        },
       });
     } else if (progress.phase === "scan" && progress.awaitingScanCode) {
       if (code !== progress.awaitingScanCode) {
@@ -77,19 +82,20 @@ export async function POST(request: Request) {
         if (!confirmOutOfOrder) {
           return NextResponse.json({
             status: "order_warning",
-            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n\n순서대로 찾지 않으면 20코인 보너스를 받을 수 없어요.\n정말 순서 없이 이 QR을 스캔할까요?`,
+            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n\n순서를 어기면 x2 코인 찬스는 사라져요.\n정말 순서 없이 이 QR을 스캔할까요?`,
             scannedCode: code,
             expectedCode: progress.awaitingScanCode,
             locationHint: expectedStep?.locationHint ?? null,
           });
         }
-        // 확인 후 무순서 전환 + 해당 QR 기록
+        // 확인 후 무순서 전환(퀴즈 중단) + 해당 QR 기록
+        const next = switchToUnordered(state);
         progress = await prisma.missionProgress.update({
           where: { id: progress.id },
           data: {
-            orderedMode: switchToUnordered(state).orderedMode,
-            phase: "quiz",
-            awaitingScanCode: null,
+            orderedMode: next.orderedMode,
+            phase: next.phase,
+            awaitingScanCode: next.awaitingScanCode,
           },
         });
       }
@@ -99,16 +105,18 @@ export async function POST(request: Request) {
         return NextResponse.json({
           status: "order_warning",
           message:
-            "지금은 퀴즈를 먼저 풀어 주세요!\n\n퀴즈 없이 QR만 스캔하면 20코인 보너스를 받을 수 없어요.\n정말 순서 없이 이 QR을 스캔할까요?",
+            "지금은 퀴즈를 먼저 풀어 주세요!\n\n퀴즈 없이 QR만 스캔하면 x2 코인 찬스는 사라져요.\n정말 순서 없이 이 QR을 스캔할까요?",
           scannedCode: code,
           expectedCode: null,
         });
       }
+      const next = switchToUnordered(state);
       progress = await prisma.missionProgress.update({
         where: { id: progress.id },
         data: {
-          orderedMode: switchToUnordered(state).orderedMode,
-          awaitingScanCode: null,
+          orderedMode: next.orderedMode,
+          phase: next.phase,
+          awaitingScanCode: next.awaitingScanCode,
         },
       });
     }
