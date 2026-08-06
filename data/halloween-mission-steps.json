@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "stepOrder": 1,
+    "question": "할로윈에 웃는 얼굴을 그려 넣는, 주황색 동그란 채소는 무엇일까요?",
+    "answer": "호박",
+    "answerDisplay": "[[\"호\",\"박\"]]",
+    "locationHint": "🏁 레이스장",
+    "qrCode": "WK11",
+    "updatedAt": "2026-08-06T12:00:23.551Z"
+  },
+  {
+    "id": 2,
+    "stepOrder": 2,
+    "question": "투명한 몸으로 밤에 나타나는 무서운 존재는 무엇일까요?",
+    "answer": "유령",
+    "answerDisplay": "[[\"유\",\"령\"]]",
+    "locationHint": "🩹 정수기 근처 구급함",
+    "qrCode": "WK12",
+    "updatedAt": "2026-08-06T12:00:33.815Z"
+  },
+  {
+    "id": 3,
+    "stepOrder": 3,
+    "question": "밤에 날아다니고, 거꾸로 매달려 자는 동물은 무엇일까요?",
+    "answer": "박쥐",
+    "answerDisplay": "[[\"박\",\"쥐\"]]",
+    "locationHint": "🚻 화장실 앞 (안으로 들어가진 않아요.)",
+    "qrCode": "WK13",
+    "updatedAt": "2026-08-06T12:00:40.942Z"
+  },
+  {
+    "id": 4,
+    "stepOrder": 4,
+    "question": "빗자루를 타고 하늘을 나는 마법을 쓰는 무서운 여자는 누구일까요?",
+    "answer": "마녀",
+    "answerDisplay": "[[\"마\",\"녀\"]]",
+    "locationHint": "🦕 공룡게임기",
+    "qrCode": "WK14",
+    "updatedAt": "2026-08-06T12:01:00.451Z"
+  },
+  {
+    "id": 5,
+    "stepOrder": 5,
+    "question": "이빨이 길고, 피를 좋아한다는 백작은?",
+    "answer": "드라큘라",
+    "answerDisplay": "[[\"드\",\"라\",\"큘\",\"라\"]]",
+    "locationHint": "📋 2층 이용안내",
+    "qrCode": "WK15",
+    "updatedAt": "2026-08-06T12:05:37.720Z"
+  },
+  {
+    "id": 6,
+    "stepOrder": 6,
+    "question": "천천히 걸어 다니며 '으아~' 하는, 되살아난 시체 괴물은 무엇일까요?",
+    "answer": "좀비",
+    "answerDisplay": "[[\"좀\",\"비\"]]",
+    "locationHint": "🚒 119기둥",
+    "qrCode": "WK16",
+    "updatedAt": "2026-08-06T12:04:04.695Z"
+  },
+  {
+    "id": 7,
+    "stepOrder": 7,
+    "question": "보름달이 뜨면 늑대로 변하는 사람은?",
+    "answer": "늑대인간",
+    "answerDisplay": "[[\"늑\",\"대\",\"인\",\"간\"]]",
+    "locationHint": "🧸 Toy창틀",
+    "qrCode": "WK17",
+    "updatedAt": "2026-08-06T12:07:41.675Z"
+  },
+  {
+    "id": 8,
+    "stepOrder": 8,
+    "question": "붕대를 온몸에 감고 있는, 이집트에서 온 듯한 괴물은?",
+    "answer": "미라",
+    "answerDisplay": "[[\"미\",\"라\"]]",
+    "locationHint": "📸 photo앞",
+    "qrCode": "WK18",
+    "updatedAt": "2026-08-06T12:04:22.096Z"
+  },
+  {
+    "id": 9,
+    "stepOrder": 9,
+    "question": "초록 얼굴에 머리에 나사 볼트가 있는 큰 괴물 이름은?",
+    "answer": "프랑켄슈타인",
+    "answerDisplay": "[[\"프\",\"랑\",\"켄\",\"슈\",\"타\",\"인\"]]",
+    "locationHint": "🤖 AI사진관 근처",
+    "qrCode": "WK19",
+    "updatedAt": "2026-08-06T12:07:31.856Z"
+  },
+  {
+    "id": 10,
+    "stepOrder": 10,
+    "question": "할로윈에도 온 가족이 함께 와서 신나게 놀 수 있는 놀이동산은 어디일까요?",
+    "answer": "월드킹",
+    "answerDisplay": "[[\"월\",\"드\",\"킹\"]]",
+    "locationHint": "🛗 2층 엘레베이터 앞",
+    "qrCode": "WK20",
+    "updatedAt": "2026-08-06T12:07:24.150Z"
+  }
+]
