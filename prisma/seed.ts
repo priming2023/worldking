@@ -20,18 +20,13 @@ async function main() {
     });
   }
 
+  // 이미 있는 단계는 덮어쓰지 않음 (관리자 수정 보존)
   for (const step of CHUSEOK_STEPS) {
     const data = seedChuseokStep(step);
     await prisma.missionStep.upsert({
       where: { stepOrder: step.stepOrder },
       create: data,
-      update: {
-        question: data.question,
-        answer: data.answer,
-        answerDisplay: data.answerDisplay,
-        locationHint: data.locationHint,
-        qrCode: data.qrCode,
-      },
+      update: {},
     });
   }
 
@@ -40,13 +35,7 @@ async function main() {
     await prisma.halloweenStep.upsert({
       where: { stepOrder: step.stepOrder },
       create: data,
-      update: {
-        question: data.question,
-        answer: data.answer,
-        answerDisplay: data.answerDisplay,
-        locationHint: data.locationHint,
-        qrCode: data.qrCode,
-      },
+      update: {},
     });
   }
 }
