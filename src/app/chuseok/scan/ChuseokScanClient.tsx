@@ -212,6 +212,7 @@ function ChuseokScanInner({ deviceId }: Props) {
         onErrClose={scan.closeErr}
         successOpen={scan.successOpen}
         successCount={scan.successCount}
+        successCanClaim={scan.successCanClaim}
         onNextQuiz={goNextQuiz}
         canClaim={data?.canClaim}
       />

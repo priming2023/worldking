@@ -1,5 +1,8 @@
 import { MISSION_TOTAL } from "@/lib/chuseok/codes";
 
+/** 카운터 수령 최소 개수 (예전 보물찾기 10개 → 추석 미션 5개) */
+export const CLAIM_MIN = 5;
+
 export type RewardMode = "ordered" | "unordered" | "partial" | "in_progress";
 
 export type RewardEstimate = {
@@ -28,19 +31,29 @@ export function estimateReward(
 ): RewardEstimate {
   const count = scans.length;
 
-  if (orderedMode && count === MISSION_TOTAL && isPerfectOrder(scans) && quizzesPassed === MISSION_TOTAL) {
+  // 순서대로 퀴즈+QR 10개 완주 → 20코인
+  if (
+    orderedMode &&
+    count === MISSION_TOTAL &&
+    isPerfectOrder(scans) &&
+    quizzesPassed === MISSION_TOTAL
+  ) {
     return { coins: 20, mode: "ordered", canClaim: true };
   }
 
-  if (!orderedMode) {
-    if (count === 0) {
-      return { coins: 0, mode: "partial", canClaim: false };
-    }
-    if (count >= MISSION_TOTAL) {
-      return { coins: 10, mode: "unordered", canClaim: true };
-    }
+  // 10개 모두 (순서 무관) → 10코인
+  if (count >= MISSION_TOTAL) {
+    return { coins: 10, mode: "unordered", canClaim: true };
+  }
+
+  // 5개 이상 → 찾은 개수만큼 카운터 수령 가능
+  if (count >= CLAIM_MIN) {
     return { coins: count, mode: "partial", canClaim: true };
   }
 
-  return { coins: 0, mode: "in_progress", canClaim: false };
+  return {
+    coins: count,
+    mode: orderedMode ? "in_progress" : "partial",
+    canClaim: false,
+  };
 }

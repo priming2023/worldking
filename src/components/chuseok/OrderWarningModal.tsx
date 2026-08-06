@@ -34,7 +34,7 @@ export function OrderWarningModal({
             onClick={onConfirm}
             className="min-h-12 w-full rounded-2xl border-2 border-chuseok-gold/40 bg-white py-3 text-base font-bold text-chuseok-burgundy/80"
           >
-            그래도 스캔하기 (순서 보너스 포기)
+            그래도 스캔하기 (순서 포기)
           </button>
         </div>
       }

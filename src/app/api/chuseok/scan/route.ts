@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         if (!confirmOutOfOrder) {
           return NextResponse.json({
             status: "order_warning",
-            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n다른 QR을 스캔하면 순서 보너스(20코인)를 받을 수 없어요. 그래도 스캔할까요?`,
+            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n\n순서대로 찾지 않으면 20코인 보너스를 받을 수 없어요.\n정말 순서 없이 이 QR을 스캔할까요?`,
             scannedCode: code,
             expectedCode: progress.awaitingScanCode,
             locationHint: expectedStep?.locationHint ?? null,
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
           status: "order_warning",
           message:
-            "지금은 퀴즈를 먼저 풀어 주세요!\n퀴즈 없이 QR만 스캔하면 순서 보너스(20코인)를 받을 수 없어요. 그래도 스캔할까요?",
+            "지금은 퀴즈를 먼저 풀어 주세요!\n\n퀴즈 없이 QR만 스캔하면 20코인 보너스를 받을 수 없어요.\n정말 순서 없이 이 QR을 스캔할까요?",
           scannedCode: code,
           expectedCode: null,
         });
@@ -161,10 +161,8 @@ export async function POST(request: Request) {
   );
 
   const foundCount = scans.length;
-  const missionComplete =
-    foundCount >= MISSION_TOTAL &&
-    (!updatedProgress.orderedMode ||
-      updatedProgress.quizzesPassed >= MISSION_TOTAL);
+  // 무순서 10개 완주 OR 순서+퀴즈 10개 완주
+  const missionComplete = foundCount >= MISSION_TOTAL;
 
   return NextResponse.json({
     status: "new",

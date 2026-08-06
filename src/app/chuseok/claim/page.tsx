@@ -94,7 +94,9 @@ export default function ChuseokClaimPage() {
             아직 받을 수 있는 코인이 없어요.
           </p>
           <p className="mt-2 text-sm text-chuseok-burgundy/70">
-            보물을 더 찾거나, 순서대로 미션을 완료해 보세요!
+            보물을 5개 이상 찾으면 카운터에서 받을 수 있어요.
+            <br />
+            순서대로 10개면 20코인!
           </p>
         </div>
       )}

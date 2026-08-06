@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { parseTreasureCode } from "@/lib/qr";
-import { isMissionCode } from "@/lib/chuseok/codes";
-import { MISSION_TOTAL } from "@/lib/chuseok/codes";
+import { isMissionCode, MISSION_TOTAL } from "@/lib/chuseok/codes";
+import { CLAIM_MIN } from "@/lib/chuseok/reward";
 
 type PendingScan = {
   text: string;
@@ -13,7 +13,7 @@ type PendingScan = {
 
 export function useChuseokScanHandler(
   deviceId: string,
-  onRefresh?: () => void,
+  onRefresh?: () => void | Promise<unknown>,
 ) {
   const router = useRouter();
   const handling = useRef(false);
@@ -25,6 +25,7 @@ export function useChuseokScanHandler(
   const [errText, setErrText] = useState("");
   const [successOpen, setSuccessOpen] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
+  const [successCanClaim, setSuccessCanClaim] = useState(false);
   const [orderWarnOpen, setOrderWarnOpen] = useState(false);
   const [orderWarnText, setOrderWarnText] = useState("");
   const pendingScanRef = useRef<PendingScan | null>(null);
@@ -52,6 +53,8 @@ export function useChuseokScanHandler(
       error?: string;
       foundCount?: number;
       missionComplete?: boolean;
+      expectedCoins?: number;
+      orderedMode?: boolean;
     }) => {
       if (json.status === "order_warning") {
         setOrderWarnText(json.message ?? "순서가 맞지 않아요. 스캔할까요?");
@@ -63,7 +66,7 @@ export function useChuseokScanHandler(
         return;
       }
       if (json.status === "new") {
-        onRefresh?.();
+        await onRefresh?.();
         const foundCount = json.foundCount ?? 0;
         if (json.missionComplete) {
           releaseHandling();
@@ -71,6 +74,7 @@ export function useChuseokScanHandler(
           return;
         }
         setSuccessCount(foundCount);
+        setSuccessCanClaim(foundCount >= CLAIM_MIN);
         setSuccessOpen(true);
         return;
       }
@@ -82,7 +86,8 @@ export function useChuseokScanHandler(
 
   const handleDecoded = useCallback(
     async (text: string, confirmOutOfOrder = false) => {
-      if (handling.current) return;
+      // 순서 경고 확인 재호출은 handling이 잠겨 있어도 허용
+      if (handling.current && !confirmOutOfOrder) return;
       const code = parseTreasureCode(text);
       if (!code || !isMissionCode(code)) return;
 
@@ -100,12 +105,14 @@ export function useChuseokScanHandler(
       handling.current = true;
       try {
         const res = await postScan(text, confirmOutOfOrder);
-        const json = await res.json() as {
+        const json = (await res.json()) as {
           status?: string;
           message?: string;
           error?: string;
           foundCount?: number;
           missionComplete?: boolean;
+          expectedCoins?: number;
+          orderedMode?: boolean;
         };
         if (!res.ok && json.status !== "order_warning") {
           setErrText(json.message ?? "스캔에 실패했어요.");
@@ -129,6 +136,8 @@ export function useChuseokScanHandler(
     const pending = pendingScanRef.current;
     pendingScanRef.current = null;
     if (pending) {
+      // 핵심: 경고 모달 때 locking된 handling을 풀어 재스캔(카운트 증가) 허용
+      handling.current = false;
       await handleDecoded(pending.text, true);
     } else {
       releaseHandling();
@@ -164,6 +173,7 @@ export function useChuseokScanHandler(
     errText,
     successOpen,
     successCount,
+    successCanClaim,
     orderWarnOpen,
     orderWarnText,
     closeDup,

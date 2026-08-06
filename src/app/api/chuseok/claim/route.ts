@@ -43,8 +43,8 @@ export async function POST(request: Request) {
         error: "not_ready",
         message:
           reward.mode === "in_progress"
-            ? "순서대로 미션을 완료하면 20코인을 받을 수 있어요!"
-            : "아직 받을 코인이 없어요.",
+            ? "보물을 5개 이상 찾으면 카운터에서 코인을 받을 수 있어요. 순서대로 모두 찾으면 20코인!"
+            : "보물을 5개 이상 찾아야 코인을 받을 수 있어요.",
         foundCount: scans.length,
         expectedCoins: reward.coins,
       },
@@ -63,10 +63,10 @@ export async function POST(request: Request) {
 
   const praise =
     reward.mode === "ordered"
-      ? "순서대로 10개를 모두 찾았어요! 20코인 대단해요!"
+      ? "🌕 순서대로 10개를 모두 찾았어요! 20코인 정말 대단해요! 🎉"
       : reward.mode === "unordered"
-        ? "10개 보물을 모두 찾았어요! 10코인!"
-        : `${reward.coins}코인을 받았어요!`;
+        ? "🎊 보물 10개를 모두 찾았어요! 10코인 축하해요! 🌕"
+        : `🪙 ${reward.coins}코인을 받았어요! 카운터에서 받아 가세요!`;
 
   return NextResponse.json({
     ok: true,

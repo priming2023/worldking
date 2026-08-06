@@ -10,8 +10,8 @@ export function ChuseokIntro({ onStart }: ChuseokIntroProps) {
         <li>🌙 추석·민속놀이 퀴즈를 맞히면 보물 QR 위치를 알려줘요.</li>
         <li>🎯 QR 10개를 <strong>순서대로</strong> 찾으면 <strong>20코인</strong>!</li>
         <li>📦 순서 상관없이 10개를 찾으면 <strong>10코인</strong>.</li>
-        <li>⚠️ 순서를 어기면 찾은 개수만큼만 받아요.</li>
-        <li>🪙 코인은 카운터에서 하루 1회 받을 수 있어요.</li>
+        <li>🪙 <strong>5개 이상</strong> 찾으면 카운터에서 찾은 개수만큼 받을 수 있어요.</li>
+        <li>⚠️ 순서를 어기면 20코인 보너스는 없어요. (하루 1회 수령)</li>
       </ul>
       <button
         type="button"

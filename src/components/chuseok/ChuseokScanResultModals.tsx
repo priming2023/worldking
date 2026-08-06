@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ChuseokModal } from "@/components/chuseok/ChuseokModal";
+import { MISSION_TOTAL } from "@/lib/chuseok/codes";
 
 type Props = {
   dupOpen: boolean;
@@ -11,6 +12,7 @@ type Props = {
   onErrClose: () => void;
   successOpen: boolean;
   successCount: number;
+  successCanClaim?: boolean;
   onNextQuiz: () => void;
   canClaim?: boolean;
 };
@@ -24,9 +26,13 @@ export function ChuseokScanResultModals({
   onErrClose,
   successOpen,
   successCount,
+  successCanClaim = false,
   onNextQuiz,
   canClaim = false,
 }: Props) {
+  const showClaim = canClaim || successCanClaim;
+  const allFound = successCount >= MISSION_TOTAL;
+
   return (
     <>
       <ChuseokModal open={dupOpen} title="이미 찾은 보물이에요" onClose={onDupClose}>
@@ -41,35 +47,60 @@ export function ChuseokScanResultModals({
 
       <ChuseokModal
         open={successOpen}
-        title="보물을 찾았어요!"
+        title={allFound ? "🎊 보물 10개 완료!" : "✨ 보물을 찾았어요!"}
         onClose={onNextQuiz}
         footer={
           <div className="mt-6 flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={onNextQuiz}
-              className="chuseok-btn-primary min-h-12 w-full rounded-2xl text-lg font-extrabold"
-            >
-              다음 퀴즈로 가기
-            </button>
-            {canClaim && (
+            {!allFound && (
+              <button
+                type="button"
+                onClick={onNextQuiz}
+                className="chuseok-btn-primary min-h-12 w-full rounded-2xl text-lg font-extrabold"
+              >
+                계속하기
+              </button>
+            )}
+            {showClaim && (
               <Link
                 href="/chuseok/claim"
+                className="chuseok-btn-primary flex min-h-12 items-center justify-center rounded-2xl text-lg font-extrabold"
+              >
+                🪙 코인 받으러 가기
+              </Link>
+            )}
+            {allFound && (
+              <Link
+                href="/chuseok/complete"
                 className="flex min-h-12 items-center justify-center rounded-2xl border-2 border-chuseok-gold/50 bg-white text-lg font-bold text-chuseok-burgundy"
               >
-                코인 받으러 가기
+                축하 화면 보기 🎉
               </Link>
             )}
           </div>
         }
       >
-        <p className="text-center text-lg font-semibold">
-          오늘 찾은 미션 보물{" "}
-          <span className="text-2xl font-extrabold tabular-nums text-chuseok-gold">
-            {successCount}
-          </span>
-          개!
-        </p>
+        <div className="space-y-3 text-center">
+          <p className="text-4xl" aria-hidden>
+            {allFound ? "🌕🎊🏆" : "🪙✨"}
+          </p>
+          <p className="text-lg font-semibold">
+            오늘 찾은 미션 보물{" "}
+            <span className="text-2xl font-extrabold tabular-nums text-chuseok-gold">
+              {successCount}
+            </span>
+            개!
+          </p>
+          {allFound && (
+            <p className="text-base font-bold text-chuseok-burgundy">
+              순서 상관없이 10개를 모두 찾았어요! 카운터에서 10코인을 받아 가세요 🎁
+            </p>
+          )}
+          {!allFound && successCanClaim && (
+            <p className="text-sm font-semibold text-chuseok-burgundy/80">
+              5개 이상! 카운터에서 코인을 받을 수 있어요 🪙
+            </p>
+          )}
+        </div>
       </ChuseokModal>
     </>
   );
