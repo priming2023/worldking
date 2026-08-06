@@ -9,42 +9,85 @@ type ClaimResult = {
   dateDisplay?: string;
 };
 
+const btnClass =
+  "chuseok-btn-primary flex min-h-14 w-full max-w-xs items-center justify-center gap-2 rounded-2xl px-6 text-lg font-extrabold active:scale-[0.99]";
+
 export default function ChuseokGiftPage() {
-  const [gift, setGift] = useState<ClaimResult | null>(null);
+  const [data, setData] = useState<ClaimResult | null | undefined>(undefined);
 
   useEffect(() => {
-    try {
+    queueMicrotask(() => {
       const raw = sessionStorage.getItem("worldking_chuseok_last_claim");
-      if (raw) {
-        setGift(JSON.parse(raw) as ClaimResult);
-        sessionStorage.removeItem("worldking_chuseok_last_claim");
+      if (!raw) {
+        setData(null);
+        return;
       }
-    } catch {
-      /* ignore */
-    }
+      try {
+        setData(JSON.parse(raw) as ClaimResult);
+      } catch {
+        setData(null);
+      }
+      sessionStorage.removeItem("worldking_chuseok_last_claim");
+    });
   }, []);
 
+  if (data === undefined) {
+    return (
+      <main className="mx-auto flex max-w-lg flex-1 flex-col items-center justify-center gap-3 px-4 py-10">
+        <p className="text-4xl" aria-hidden>
+          🎁
+        </p>
+        <p className="text-lg font-semibold text-chuseok-burgundy" role="status">
+          불러오는 중…
+        </p>
+      </main>
+    );
+  }
+
+  if (data === null) {
+    return (
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-6 px-4 py-12 text-center">
+        <p className="text-5xl" aria-hidden>
+          🎀
+        </p>
+        <h1 className="chuseok-title text-2xl font-extrabold text-chuseok-burgundy">
+          코인 화면
+        </h1>
+        <p className="max-w-sm text-lg font-medium leading-relaxed text-chuseok-burgundy/90">
+          이 페이지는 코인 받기 직후에만 열려요. 🏠😊
+          <br />
+          홈으로 돌아가 주세요.
+        </p>
+        <Link href="/chuseok" className={btnClass}>
+          <span>홈으로</span>
+          <span aria-hidden>🌕</span>
+        </Link>
+      </main>
+    );
+  }
+
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-6 px-4 py-10 text-center">
-      <h1 className="chuseok-title text-3xl font-extrabold text-chuseok-burgundy">
-        코인 수령 완료!
-      </h1>
-      {gift && (
-        <>
-          <p className="text-5xl font-extrabold tabular-nums text-chuseok-gold">
-            {gift.coinAmount}코인
-          </p>
-          <p className="text-lg font-semibold text-chuseok-burgundy">{gift.praise}</p>
-          {gift.dateDisplay && (
-            <p className="text-sm text-chuseok-burgundy/70">{gift.dateDisplay}</p>
-          )}
-        </>
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-6 px-4 py-12 text-center">
+      <p className="text-5xl" aria-hidden>
+        🥳
+      </p>
+      {data.dateDisplay && (
+        <p className="text-lg font-semibold text-chuseok-burgundy/70">{data.dateDisplay}</p>
       )}
-      <Link
-        href="/chuseok"
-        className="chuseok-btn-primary flex min-h-14 w-full max-w-xs items-center justify-center rounded-2xl text-lg font-extrabold"
-      >
-        홈으로
+      <h1 className="chuseok-title text-3xl font-extrabold text-chuseok-burgundy sm:text-4xl">
+        🎉 코인 받기 완료! 🎁✨
+      </h1>
+      <p className="max-w-sm rounded-2xl bg-chuseok-burgundy/5 px-4 py-5 text-2xl font-extrabold leading-snug text-chuseok-burgundy ring-1 ring-chuseok-gold/30">
+        😄⭐ {data.praise ?? `${data.coinAmount ?? 0}코인 받았어요!`} 🎊
+      </p>
+      <p className="max-w-sm text-base font-semibold leading-relaxed text-chuseok-burgundy/80">
+        🎁🤗
+        <br />
+        카운터에서 코인을 받아 가세요. 오늘도 즐거운 하루 보내요!
+      </p>
+      <Link href="/chuseok" className={btnClass}>
+        <span>홈으로</span>
+        <span aria-hidden>🏠🌕</span>
       </Link>
     </main>
   );
