@@ -1,6 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { TREASURE_CODES } from "../src/lib/treasure-codes";
-import { MISSION_STEPS_SEED, seedStepToDb } from "../src/lib/chuseok/mission-data";
+import {
+  MISSION_STEPS_SEED as CHUSEOK_STEPS,
+  seedStepToDb as seedChuseokStep,
+} from "../src/lib/chuseok/mission-data";
+import {
+  MISSION_STEPS_SEED as HALLOWEEN_STEPS,
+  seedStepToDb as seedHalloweenStep,
+} from "../src/lib/halloween/mission-data";
 
 const prisma = new PrismaClient();
 
@@ -13,9 +20,24 @@ async function main() {
     });
   }
 
-  for (const step of MISSION_STEPS_SEED) {
-    const data = seedStepToDb(step);
+  for (const step of CHUSEOK_STEPS) {
+    const data = seedChuseokStep(step);
     await prisma.missionStep.upsert({
+      where: { stepOrder: step.stepOrder },
+      create: data,
+      update: {
+        question: data.question,
+        answer: data.answer,
+        answerDisplay: data.answerDisplay,
+        locationHint: data.locationHint,
+        qrCode: data.qrCode,
+      },
+    });
+  }
+
+  for (const step of HALLOWEEN_STEPS) {
+    const data = seedHalloweenStep(step);
+    await prisma.halloweenStep.upsert({
       where: { stepOrder: step.stepOrder },
       create: data,
       update: {
