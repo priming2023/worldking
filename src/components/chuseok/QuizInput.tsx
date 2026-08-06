@@ -14,82 +14,92 @@ function graphemes(text: string): string[] {
 }
 
 /**
- * 네모칸은 표시만, 실제 입력은 투명한 단일 input.
- * 칸마다 input을 두면 한글 첫 글자(보 등) 조합이 깨짐.
+ * 모바일(아이폰·안드로이드) 한글 입력용.
+ * - 잘 보이는 큰 입력창 (투명 오버레이 X, 글자 16px 이상 → iOS 확대 방지)
+ * - 한글 조합(IME) 중에는 값을 자르지 않음
+ * - 네모칸은 글자 수 힌트 + 입력된 글자 표시
  */
 export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
   const flatCount = display.reduce((s, g) => s + g.length, 0);
   const [text, setText] = useState("");
+  const composingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setText("");
-    // 퀴즈가 바뀌면 입력란에 포커스
-    requestAnimationFrame(() => inputRef.current?.focus());
+    composingRef.current = false;
   }, [flatCount, display]);
 
-  const chars = graphemes(text.replace(/\s/g, "")).slice(0, flatCount);
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const next = graphemes(e.target.value.replace(/\s/g, ""))
-        .slice(0, flatCount)
-        .join("");
-      setText(next);
-    },
+  const trimToBoxes = useCallback(
+    (raw: string) =>
+      graphemes(raw.replace(/\s/g, "")).slice(0, flatCount).join(""),
     [flatCount],
   );
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      let idx = 0;
-      const words = display.map((group) =>
-        group.map(() => chars[idx++] ?? "").join(""),
-      );
-      onSubmit(words.join(" "));
-    },
-    [chars, display, onSubmit],
-  );
+  const chars = graphemes(text.replace(/\s/g, "")).slice(0, flatCount);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    // 조합 중에는 절대 자르거나 normalize 하지 않음 (송·보 등 깨짐 방지)
+    if (composingRef.current) {
+      setText(raw);
+      return;
+    }
+    setText(trimToBoxes(raw));
+  };
+
+  const handleCompositionStart = () => {
+    composingRef.current = true;
+  };
+
+  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+    composingRef.current = false;
+    setText(trimToBoxes(e.currentTarget.value));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 공백 무시 비교는 서버/normalize에서 처리. 여기서는 칸 글자만 합쳐 전달
+    onSubmit(chars.join(""));
+  };
 
   let flatIdx = 0;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
-      <div className="relative w-full max-w-sm">
-        {/* 표시용 네모칸 */}
-        <div className="pointer-events-none flex flex-wrap items-center justify-center gap-3 px-1 py-2">
-          {display.map((group, gi) => (
-            <div key={gi} className="flex items-center gap-3">
-              {gi > 0 && (
-                <span className="text-chuseok-gold/60 text-lg font-bold" aria-hidden>
-                  ·
-                </span>
-              )}
-              <div className="flex gap-1.5">
-                {group.map((_, ci) => {
-                  const i = flatIdx++;
-                  const filled = chars[i] ?? "";
-                  const isActive = i === Math.min(chars.length, flatCount - 1);
-                  return (
-                    <span
-                      key={`${gi}-${ci}`}
-                      className={`chuseok-box-input flex h-12 w-11 items-center justify-center overflow-hidden rounded-lg border-2 bg-white/95 text-xl font-bold text-chuseok-burgundy shadow-sm sm:h-14 sm:w-12 sm:text-2xl ${
-                        isActive
-                          ? "border-chuseok-gold ring-2 ring-chuseok-gold/30"
-                          : "border-chuseok-gold/50"
-                      }`}
-                    >
-                      {filled}
-                    </span>
-                  );
-                })}
-              </div>
+    <form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-4">
+      {/* 글자 수 힌트 네모 */}
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {display.map((group, gi) => (
+          <div key={gi} className="flex items-center gap-3">
+            {gi > 0 && (
+              <span className="text-chuseok-gold/60 text-lg font-bold" aria-hidden>
+                ·
+              </span>
+            )}
+            <div className="flex gap-1.5">
+              {group.map((_, ci) => {
+                const i = flatIdx++;
+                const filled = chars[i] ?? "";
+                return (
+                  <span
+                    key={`${gi}-${ci}`}
+                    className="chuseok-box-input flex h-11 w-10 items-center justify-center rounded-lg border-2 border-chuseok-gold/50 bg-white/95 text-lg font-bold text-chuseok-burgundy sm:h-12 sm:w-11 sm:text-xl"
+                    aria-hidden
+                  >
+                    {filled}
+                  </span>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        {/* 실제 입력 (투명 오버레이) — 한글 IME 정상 */}
+      {/* 모바일용 실제 입력창 — 크게, 보이기 쉽게 */}
+      <label className="flex w-full max-w-sm flex-col gap-2">
+        <span className="text-center text-sm font-bold text-chuseok-burgundy/80">
+          정답 입력 ({flatCount}글자)
+        </span>
         <input
           ref={inputRef}
           type="text"
@@ -97,24 +107,23 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
           enterKeyHint="done"
           autoComplete="off"
           autoCorrect="off"
+          autoCapitalize="off"
           spellCheck={false}
           disabled={disabled}
           value={text}
-          aria-label="정답 입력"
-          className="absolute inset-0 z-10 cursor-text bg-transparent text-transparent caret-chuseok-burgundy outline-none"
-          style={{ caretColor: "#8b2942" }}
+          placeholder="여기에 정답을 입력하세요"
+          className="min-h-14 w-full rounded-2xl border-2 border-chuseok-gold/60 bg-white px-4 py-3 text-center text-lg font-bold text-chuseok-burgundy shadow-sm outline-none placeholder:font-semibold placeholder:text-chuseok-burgundy/35 focus:border-chuseok-gold focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50"
+          style={{ fontSize: "16px" }}
           onChange={handleChange}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
         />
-      </div>
-
-      <p className="text-xs font-semibold text-chuseok-burgundy/60">
-        {chars.length}/{flatCount}글자
-      </p>
+      </label>
 
       <button
         type="submit"
-        disabled={disabled}
-        className="chuseok-btn-primary min-h-12 w-full max-w-xs rounded-2xl px-6 py-3 text-lg font-extrabold disabled:opacity-50"
+        disabled={disabled || chars.length === 0}
+        className="chuseok-btn-primary min-h-14 w-full max-w-sm rounded-2xl px-6 py-3 text-lg font-extrabold disabled:opacity-50"
       >
         정답 확인
       </button>
