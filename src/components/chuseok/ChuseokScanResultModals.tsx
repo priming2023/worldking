@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Modal } from "@/components/Modal";
+import { ChuseokModal } from "@/components/chuseok/ChuseokModal";
 
 type Props = {
   dupOpen: boolean;
@@ -29,17 +29,17 @@ export function ChuseokScanResultModals({
 }: Props) {
   return (
     <>
-      <Modal open={dupOpen} title="이미 찾은 보물이에요" onClose={onDupClose}>
-        <p className="text-center text-lg font-semibold text-chuseok-burgundy">
+      <ChuseokModal open={dupOpen} title="이미 찾은 보물이에요" onClose={onDupClose}>
+        <p className="text-center text-lg font-semibold">
           이 QR은 오늘 이미 찾았어요. 다른 미션 QR을 찍어 주세요!
         </p>
-      </Modal>
+      </ChuseokModal>
 
-      <Modal open={errOpen} title="알림" onClose={onErrClose}>
+      <ChuseokModal open={errOpen} title="알림" onClose={onErrClose}>
         <p>{errText}</p>
-      </Modal>
+      </ChuseokModal>
 
-      <Modal
+      <ChuseokModal
         open={successOpen}
         title="보물을 찾았어요!"
         onClose={onNextQuiz}
@@ -63,14 +63,14 @@ export function ChuseokScanResultModals({
           </div>
         }
       >
-        <p className="text-center text-lg font-semibold text-chuseok-burgundy">
+        <p className="text-center text-lg font-semibold">
           오늘 찾은 미션 보물{" "}
           <span className="text-2xl font-extrabold tabular-nums text-chuseok-gold">
             {successCount}
           </span>
           개!
         </p>
-      </Modal>
+      </ChuseokModal>
     </>
   );
 }

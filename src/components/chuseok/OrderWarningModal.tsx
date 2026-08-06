@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "@/components/Modal";
+import { ChuseokModal } from "@/components/chuseok/ChuseokModal";
 
 type OrderWarningModalProps = {
   open: boolean;
@@ -16,7 +16,7 @@ export function OrderWarningModal({
   onCancel,
 }: OrderWarningModalProps) {
   return (
-    <Modal
+    <ChuseokModal
       open={open}
       title="다른 QR이에요"
       onClose={onCancel}
@@ -40,6 +40,6 @@ export function OrderWarningModal({
       }
     >
       <p className="whitespace-pre-line text-base leading-relaxed">{message}</p>
-    </Modal>
+    </ChuseokModal>
   );
 }
