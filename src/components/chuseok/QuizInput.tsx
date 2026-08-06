@@ -7,6 +7,10 @@ type QuizInputProps = {
   display: AnswerDisplay;
   onSubmit: (value: string) => void;
   disabled?: boolean;
+  /** 예: "숫자3개" — 없으면 "N글자" */
+  countLabel?: string;
+  /** true면 모바일 숫자 키패드 */
+  numeric?: boolean;
 };
 
 function graphemes(text: string): string[] {
@@ -19,8 +23,15 @@ function graphemes(text: string): string[] {
  * - 한글 조합(IME) 중에는 값을 자르지 않음
  * - 네모칸은 글자 수 힌트 + 입력된 글자 표시
  */
-export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
+export function QuizInput({
+  display,
+  onSubmit,
+  disabled,
+  countLabel,
+  numeric = false,
+}: QuizInputProps) {
   const flatCount = display.reduce((s, g) => s + g.length, 0);
+  const labelText = countLabel ?? `${flatCount}글자`;
   const [text, setText] = useState("");
   const composingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,12 +109,12 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
       {/* 모바일용 실제 입력창 — 크게, 보이기 쉽게 */}
       <label className="flex w-full max-w-sm flex-col gap-2">
         <span className="text-center text-sm font-bold text-chuseok-burgundy/80">
-          정답 입력 ({flatCount}글자)
+          정답 입력 ({labelText})
         </span>
         <input
           ref={inputRef}
-          type="text"
-          inputMode="text"
+          type={numeric ? "tel" : "text"}
+          inputMode={numeric ? "numeric" : "text"}
           enterKeyHint="done"
           autoComplete="off"
           autoCorrect="off"
@@ -111,7 +122,7 @@ export function QuizInput({ display, onSubmit, disabled }: QuizInputProps) {
           spellCheck={false}
           disabled={disabled}
           value={text}
-          placeholder="여기에 정답을 입력하세요"
+          placeholder={numeric ? "숫자로 입력하세요" : "여기에 정답을 입력하세요"}
           className="min-h-14 w-full rounded-2xl border-2 border-chuseok-gold/60 bg-white px-4 py-3 text-center text-lg font-bold text-chuseok-burgundy shadow-sm outline-none placeholder:font-semibold placeholder:text-chuseok-burgundy/35 focus:border-chuseok-gold focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50"
           style={{ fontSize: "16px" }}
           onChange={handleChange}
