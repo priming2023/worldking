@@ -1,6 +1,6 @@
-import { MISSION_TOTAL } from "@/lib/halloween/codes";
+import { MISSION_TOTAL, expectedCodeForStep } from "@/lib/halloween/codes";
 
-/** 카운터 수령 최소 개수 (예전 보물찾기 10개 → 추석 미션 5개) */
+/** 카운터 수령 최소 개수 (추석과 동일: 5개↑) */
 export const CLAIM_MIN = 5;
 
 export type RewardMode = "ordered" | "unordered" | "partial" | "in_progress";
@@ -13,12 +13,12 @@ export type RewardEstimate = {
 
 type ScanRow = { code: string; sequenceIndex: number };
 
-/** 스캔 순서가 WK01→WK10 완벽 순서인지 */
+/** 스캔 순서가 WK11→WK20 완벽 순서인지 */
 export function isPerfectOrder(scans: ScanRow[]): boolean {
   if (scans.length !== MISSION_TOTAL) return false;
   const sorted = [...scans].sort((a, b) => a.sequenceIndex - b.sequenceIndex);
   for (let i = 0; i < MISSION_TOTAL; i++) {
-    const expected = `WK${String(i + 1).padStart(2, "0")}`;
+    const expected = expectedCodeForStep(i + 1);
     if (sorted[i]?.code !== expected) return false;
   }
   return true;
@@ -31,7 +31,7 @@ export function estimateReward(
 ): RewardEstimate {
   const count = scans.length;
 
-  // 순서대로 퀴즈+QR 10개 완주 → 20코인
+  // 순서대로 퀴즈+QR 10개 완주 → 20코인 (x2)
   if (
     orderedMode &&
     count === MISSION_TOTAL &&
@@ -41,7 +41,7 @@ export function estimateReward(
     return { coins: 20, mode: "ordered", canClaim: true };
   }
 
-  // 10개 모두 (순서 무관) → 10코인
+  // 10개 모두 (순서 무관 / 순서 포기) → 10코인
   if (count >= MISSION_TOTAL) {
     return { coins: 10, mode: "unordered", canClaim: true };
   }
