@@ -94,7 +94,7 @@ export function QuizInput({
                 return (
                   <span
                     key={`${gi}-${ci}`}
-                    className="halloween-box-input flex h-11 w-10 items-center justify-center rounded-lg border-2 border-halloween-gold/50 bg-white/95 text-lg font-bold text-halloween-burgundy sm:h-12 sm:w-11 sm:text-xl"
+                    className="halloween-box-input flex h-11 w-10 items-center justify-center rounded-lg border-2 border-halloween-gold/50 text-lg font-bold sm:h-12 sm:w-11 sm:text-xl"
                     aria-hidden
                   >
                     {filled}

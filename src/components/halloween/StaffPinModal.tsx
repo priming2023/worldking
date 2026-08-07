@@ -98,7 +98,7 @@ export function StaffPinModal({
         />
       </label>
       {showErr && (
-        <p className="mt-3 text-center text-sm font-bold text-red-700" role="alert">
+        <p className="mt-3 text-center text-sm font-bold text-orange-300" role="alert">
           {showErr}
         </p>
       )}

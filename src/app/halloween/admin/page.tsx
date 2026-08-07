@@ -97,37 +97,37 @@ export default function HalloweenAdminPage() {
             <h2 className="font-extrabold text-halloween-burgundy">
               {step.stepOrder}번 · {step.qrCode}
             </h2>
-            <label className="mt-3 block text-xs font-bold text-halloween-burgundy/80">
+            <label className="mt-3 block text-xs font-bold text-halloween-gold">
               문제
               <textarea
                 value={step.question}
                 onChange={(e) => updateStep(i, "question", e.target.value)}
                 rows={2}
-                className="mt-1 w-full rounded-lg border px-2 py-1 text-sm"
+                className="halloween-field"
               />
             </label>
-            <label className="mt-2 block text-xs font-bold text-halloween-burgundy/80">
+            <label className="mt-2 block text-xs font-bold text-halloween-gold">
               정답
               <input
                 value={step.answer}
                 onChange={(e) => updateStep(i, "answer", e.target.value)}
-                className="mt-1 w-full rounded-lg border px-2 py-1 text-sm"
+                className="halloween-field"
               />
             </label>
-            <label className="mt-2 block text-xs font-bold text-halloween-burgundy/80">
+            <label className="mt-2 block text-xs font-bold text-halloween-gold">
               칸 패턴 (JSON)
               <input
                 value={step.answerDisplay}
                 onChange={(e) => updateStep(i, "answerDisplay", e.target.value)}
-                className="mt-1 w-full rounded-lg border px-2 py-1 font-mono text-xs"
+                className="halloween-field font-mono text-xs"
               />
             </label>
-            <label className="mt-2 block text-xs font-bold text-halloween-burgundy/80">
+            <label className="mt-2 block text-xs font-bold text-halloween-gold">
               위치 힌트
               <input
                 value={step.locationHint}
                 onChange={(e) => updateStep(i, "locationHint", e.target.value)}
-                className="mt-1 w-full rounded-lg border px-2 py-1 text-sm"
+                className="halloween-field"
               />
             </label>
             <button

@@ -164,7 +164,7 @@ function HalloweenScanInner({ deviceId }: Props) {
       )}
 
       {scanCameraError && (
-        <p className="rounded-2xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-900" role="alert">
+        <p className="rounded-2xl bg-red-950/80 px-3 py-2 text-sm font-semibold text-orange-200 ring-1 ring-red-500/40" role="alert">
           {scanCameraError}
         </p>
       )}

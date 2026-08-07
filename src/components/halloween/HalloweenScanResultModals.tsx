@@ -91,12 +91,12 @@ export function HalloweenScanResultModals({
             개!
           </p>
           {allFound && (
-            <p className="text-base font-bold text-halloween-burgundy">
+            <p className="text-base font-bold text-[#faf5ff]">
               순서 상관없이 10개를 모두 찾았어요! 카운터에서 10코인을 받아 가세요 🎁
             </p>
           )}
           {!allFound && successCanClaim && (
-            <p className="text-sm font-semibold text-halloween-burgundy/80">
+            <p className="text-sm font-semibold text-halloween-gold">
               5개 이상! 카운터에서 코인을 받을 수 있어요 🪙
             </p>
           )}

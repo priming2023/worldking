@@ -37,7 +37,7 @@ export function HalloweenScanQuizPanel({
         />
       </div>
       {error && (
-        <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-center text-sm font-bold text-red-800" role="alert">
+        <p className="mt-4 rounded-xl bg-red-950/80 px-3 py-2 text-center text-sm font-bold text-orange-200 ring-1 ring-red-500/40" role="alert">
           {error}
         </p>
       )}
