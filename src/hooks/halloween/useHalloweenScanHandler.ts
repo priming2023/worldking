@@ -26,6 +26,7 @@ export function useHalloweenScanHandler(
   const [successOpen, setSuccessOpen] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
   const [successCanClaim, setSuccessCanClaim] = useState(false);
+  const [successOrderedMode, setSuccessOrderedMode] = useState(true);
   const [orderWarnOpen, setOrderWarnOpen] = useState(false);
   const [orderWarnText, setOrderWarnText] = useState("");
   const pendingScanRef = useRef<PendingScan | null>(null);
@@ -76,6 +77,7 @@ export function useHalloweenScanHandler(
         }
         setSuccessCount(foundCount);
         setSuccessCanClaim(foundCount >= CLAIM_MIN);
+        setSuccessOrderedMode(json.orderedMode !== false);
         setSuccessOpen(true);
 
         // 순서 모드: QR 성공 후 바로 다음 퀴즈로 (홈으로 나가지 않아도 됨)
@@ -187,6 +189,7 @@ export function useHalloweenScanHandler(
     successOpen,
     successCount,
     successCanClaim,
+    successOrderedMode,
     orderWarnOpen,
     orderWarnText,
     closeDup,

@@ -15,9 +15,11 @@ type Props = {
   successCanClaim?: boolean;
   onNextQuiz: () => void;
   canClaim?: boolean;
+  /** false면 무순서(QR만) — 버튼 문구 분기 */
+  orderedMode?: boolean;
 };
 
-/** 추석 미션 전용 — 기존 /claim·/map 과 연결하지 않음 */
+/** 할로윈 미션 스캔 결과 모달 */
 export function HalloweenScanResultModals({
   dupOpen,
   onDupClose,
@@ -29,9 +31,11 @@ export function HalloweenScanResultModals({
   successCanClaim = false,
   onNextQuiz,
   canClaim = false,
+  orderedMode = true,
 }: Props) {
   const showClaim = canClaim || successCanClaim;
   const allFound = successCount >= MISSION_TOTAL;
+  const continueLabel = orderedMode ? "다음 퀴즈로" : "다음 QR 찾으러";
 
   return (
     <>
@@ -57,7 +61,7 @@ export function HalloweenScanResultModals({
                 onClick={onNextQuiz}
                 className="halloween-btn-primary min-h-12 w-full rounded-2xl text-lg font-extrabold"
               >
-                다음 퀴즈로
+                {continueLabel}
               </button>
             )}
             {showClaim && (

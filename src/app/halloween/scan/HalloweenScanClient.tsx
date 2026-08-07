@@ -218,6 +218,7 @@ function HalloweenScanInner({ deviceId }: Props) {
         successCanClaim={scan.successCanClaim}
         onNextQuiz={goNextQuiz}
         canClaim={data?.canClaim}
+        orderedMode={scan.successOrderedMode}
       />
 
       <OrderWarningModal
