@@ -55,6 +55,7 @@ export function useHalloweenScanHandler(
       missionComplete?: boolean;
       expectedCoins?: number;
       orderedMode?: boolean;
+      nextPhase?: string;
     }) => {
       if (json.status === "order_warning") {
         setOrderWarnText(json.message ?? "순서가 맞지 않아요. 스캔할까요?");
@@ -76,6 +77,17 @@ export function useHalloweenScanHandler(
         setSuccessCount(foundCount);
         setSuccessCanClaim(foundCount >= CLAIM_MIN);
         setSuccessOpen(true);
+
+        // 순서 모드: QR 성공 후 바로 다음 퀴즈로 (홈으로 나가지 않아도 됨)
+        const goNextQuizSoon =
+          json.orderedMode !== false && json.nextPhase === "quiz";
+        if (goNextQuizSoon) {
+          window.setTimeout(() => {
+            setSuccessOpen(false);
+            releaseHandling();
+            void onRefresh?.();
+          }, 900);
+        }
         return;
       }
       setErrText(json.message ?? "스캔에 실패했어요.");
@@ -113,6 +125,7 @@ export function useHalloweenScanHandler(
           missionComplete?: boolean;
           expectedCoins?: number;
           orderedMode?: boolean;
+          nextPhase?: string;
         };
         if (!res.ok && json.status !== "order_warning") {
           setErrText(json.message ?? "스캔에 실패했어요.");

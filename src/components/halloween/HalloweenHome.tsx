@@ -163,10 +163,6 @@ export function HalloweenHome({ deviceId }: HalloweenHomeProps) {
               display={data.currentQuiz.answerDisplay}
               onSubmit={handleQuizSubmit}
               disabled={submitting}
-              countLabel={
-                data.currentQuiz.stepOrder === 3 ? "숫자3개" : undefined
-              }
-              numeric={data.currentQuiz.stepOrder === 3}
             />
           </div>
           {quizErr && (

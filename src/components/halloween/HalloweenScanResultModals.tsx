@@ -57,7 +57,7 @@ export function HalloweenScanResultModals({
                 onClick={onNextQuiz}
                 className="halloween-btn-primary min-h-12 w-full rounded-2xl text-lg font-extrabold"
               >
-                계속하기
+                다음 퀴즈로
               </button>
             )}
             {showClaim && (

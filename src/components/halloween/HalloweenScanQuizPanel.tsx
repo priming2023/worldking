@@ -34,8 +34,6 @@ export function HalloweenScanQuizPanel({
           display={answerDisplay}
           onSubmit={onSubmit}
           disabled={submitting}
-          countLabel={stepOrder === 3 ? "숫자3개" : undefined}
-          numeric={stepOrder === 3}
         />
       </div>
       {error && (
