@@ -11,7 +11,7 @@ export function ChuseokIntro({ onStart }: ChuseokIntroProps) {
         <li>🎯 QR 10개를 <strong>순서대로</strong> 찾으면 <strong>20코인</strong>!</li>
         <li>📦 순서 상관없이 10개를 찾으면 <strong>10코인</strong>.</li>
         <li>🪙 <strong>5개 이상</strong> 찾으면 카운터에서 찾은 개수만큼 받을 수 있어요.</li>
-        <li>⚠️ 순서를 어기면 20코인 보너스는 없어요. (하루 1회 수령)</li>
+        <li>⚠️ 순서를 어기면 x2 코인 찬스는 사라져요. (하루 1회 수령)</li>
       </ul>
       <button
         type="button"
