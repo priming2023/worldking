@@ -1,7 +1,7 @@
 "use client";
 
 import type { AnswerDisplay } from "@/lib/chuseok/answer-pattern";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type QuizInputProps = {
   display: AnswerDisplay;
@@ -17,11 +17,18 @@ function graphemes(text: string): string[] {
   return Array.from(text.normalize("NFC"));
 }
 
+function trimToBoxes(raw: string, flatCount: number): string {
+  return graphemes(raw.replace(/\s/g, "")).slice(0, flatCount).join("");
+}
+
+/** 미완성 자모(천지인 중간 상태) */
+function hasIncompleteHangul(text: string): boolean {
+  return /[\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uD7B0-\uD7FF]/.test(text);
+}
+
 /**
- * 모바일(아이폰·안드로이드) 한글 입력용.
- * - 잘 보이는 큰 입력창 (투명 오버레이 X, 글자 16px 이상 → iOS 확대 방지)
- * - 한글 조합(IME) 중에는 값을 자르지 않음
- * - 네모칸은 글자 수 힌트 + 입력된 글자 표시
+ * 모바일 한글 입력(아이폰 천지인 포함).
+ * controlled value 로 IME를 덮어쓰지 않고, 표시용 상태만 갱신한다.
  */
 export function QuizInput({
   display,
@@ -32,31 +39,48 @@ export function QuizInput({
 }: QuizInputProps) {
   const flatCount = display.reduce((s, g) => s + g.length, 0);
   const labelText = countLabel ?? `${flatCount}글자`;
-  const [text, setText] = useState("");
-  const composingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const composingRef = useRef(false);
+  const [preview, setPreview] = useState("");
+  // 문제 바뀔 때 input DOM 리셋
+  const fieldKey = useId() + String(flatCount) + JSON.stringify(display);
 
   useEffect(() => {
-    setText("");
+    setPreview("");
     composingRef.current = false;
-  }, [flatCount, display]);
+    if (inputRef.current) inputRef.current.value = "";
+  }, [fieldKey]);
 
-  const trimToBoxes = useCallback(
-    (raw: string) =>
-      graphemes(raw.replace(/\s/g, "")).slice(0, flatCount).join(""),
-    [flatCount],
-  );
-
-  const chars = graphemes(text.replace(/\s/g, "")).slice(0, flatCount);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    // 조합 중에는 절대 자르거나 normalize 하지 않음 (송·보 등 깨짐 방지)
-    if (composingRef.current) {
-      setText(raw);
+  const syncPreview = (raw: string, forceTrim: boolean) => {
+    if (!forceTrim && (composingRef.current || hasIncompleteHangul(raw))) {
+      setPreview(raw);
       return;
     }
-    setText(trimToBoxes(raw));
+    const trimmed = trimToBoxes(raw, flatCount);
+    setPreview(trimmed);
+    if (inputRef.current && inputRef.current.value !== trimmed && forceTrim) {
+      inputRef.current.value = trimmed;
+    }
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const raw = e.currentTarget.value;
+    const native = e.nativeEvent as InputEvent;
+    const composing =
+      composingRef.current || native.isComposing === true;
+
+    if (composing || hasIncompleteHangul(raw)) {
+      composingRef.current = composing || hasIncompleteHangul(raw);
+      setPreview(raw);
+      return;
+    }
+    composingRef.current = false;
+    // 확정된 뒤에만 길이 제한 (입력 중 DOM value는 건드리지 않음)
+    const trimmed = trimToBoxes(raw, flatCount);
+    setPreview(trimmed);
+    if (raw.replace(/\s/g, "").length > flatCount && inputRef.current) {
+      inputRef.current.value = trimmed;
+    }
   };
 
   const handleCompositionStart = () => {
@@ -64,21 +88,25 @@ export function QuizInput({
   };
 
   const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
-    composingRef.current = false;
-    setText(trimToBoxes(e.currentTarget.value));
+    const value = e.currentTarget.value;
+    // 아이폰 천지인: compositionend 직후 동기 조작이 다음 음절을 막음
+    window.setTimeout(() => {
+      composingRef.current = false;
+      syncPreview(value, true);
+    }, 0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 공백 무시 비교는 서버/normalize에서 처리. 여기서는 칸 글자만 합쳐 전달
-    onSubmit(chars.join(""));
+    const raw = inputRef.current?.value ?? preview;
+    onSubmit(trimToBoxes(raw, flatCount));
   };
 
+  const chars = graphemes(preview.replace(/\s/g, "")).slice(0, flatCount);
   let flatIdx = 0;
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-4">
-      {/* 글자 수 힌트 네모 */}
       <div className="flex flex-wrap items-center justify-center gap-3">
         {display.map((group, gi) => (
           <div key={gi} className="flex items-center gap-3">
@@ -106,12 +134,12 @@ export function QuizInput({
         ))}
       </div>
 
-      {/* 모바일용 실제 입력창 — 크게, 보이기 쉽게 */}
       <label className="flex w-full max-w-sm flex-col gap-2">
         <span className="text-center text-sm font-bold text-chuseok-burgundy/80">
           정답 입력 ({labelText})
         </span>
         <input
+          key={fieldKey}
           ref={inputRef}
           type={numeric ? "tel" : "text"}
           inputMode={numeric ? "numeric" : "text"}
@@ -121,11 +149,11 @@ export function QuizInput({
           autoCapitalize="off"
           spellCheck={false}
           disabled={disabled}
-          value={text}
+          defaultValue=""
           placeholder={numeric ? "숫자로 입력하세요" : "여기에 정답을 입력하세요"}
           className="min-h-14 w-full rounded-2xl border-2 border-chuseok-gold/60 bg-white px-4 py-3 text-center text-lg font-bold text-chuseok-burgundy shadow-sm outline-none placeholder:font-semibold placeholder:text-chuseok-burgundy/35 focus:border-chuseok-gold focus:ring-2 focus:ring-chuseok-gold/30 disabled:opacity-50"
           style={{ fontSize: "16px" }}
-          onChange={handleChange}
+          onInput={handleInput}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
         />
