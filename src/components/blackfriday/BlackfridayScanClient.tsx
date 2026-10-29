@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BlackfridayHeader } from "@/components/blackfriday/BlackfridayHeader";
 import { BlackfridayQuizPanel } from "@/components/blackfriday/BlackfridayQuizPanel";
@@ -32,6 +32,7 @@ type Session = {
 export function BlackfridayScanClient() {
   const deviceId = useBlackfridayDeviceId();
   const router = useRouter();
+  const freeScan = useSearchParams().get("free") === "1";
   const [session, setSession] = useState<Session | null>(null);
   const [notice, setNotice] = useState("");
   const [orderText, setOrderText] = useState("");
@@ -102,7 +103,7 @@ export function BlackfridayScanClient() {
     }
   }
 
-  const inQuiz = Boolean(session?.orderedMode && session.phase === "quiz" && session.currentQuiz);
+  const inQuiz = Boolean(session?.orderedMode && session.phase === "quiz" && session.currentQuiz) && !freeScan;
   const showCamera = Boolean(session) && !inQuiz;
 
   return (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { BlackfridayHeader } from "@/components/blackfriday/BlackfridayHeader";
+import { BlackfridayIntro } from "@/components/blackfriday/BlackfridayIntro";
 import { BlackfridayQuizPanel } from "@/components/blackfriday/BlackfridayQuizPanel";
 import { useBlackfridayDeviceId } from "@/hooks/blackfriday/useBlackfridayDeviceId";
 
@@ -27,6 +28,7 @@ type Session = {
   missionComplete: boolean;
   quizWrongCount: number;
   canClaim: boolean;
+  expectedCoins: number;
 };
 
 export function BlackfridayHome() {
@@ -35,6 +37,7 @@ export function BlackfridayHome() {
   const [session, setSession] = useState<Session | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   const reload = useCallback(async () => {
     if (!deviceId) return;
@@ -42,6 +45,9 @@ export function BlackfridayHome() {
     if (!res.ok) return;
     const data = (await res.json()) as Session;
     setSession(data);
+    if (data.quizzesPassed > 0 || data.foundCount > 0 || data.phase === "scan" || !data.orderedMode) {
+      setShowIntro(false);
+    }
     if (data.missionComplete) router.replace("/blackfriday/complete");
   }, [deviceId, router]);
 
@@ -80,15 +86,24 @@ export function BlackfridayHome() {
   }
 
   const quiz = session.currentQuiz;
+  const introVisible = showIntro && session.quizzesPassed === 0 && session.foundCount === 0 && session.orderedMode;
   const progress = quiz
     ? `${quiz.stepOrder}/10`
     : `${Math.max(session.foundCount, session.quizzesPassed)}/10`;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-4 py-3">
-      <BlackfridayHeader progress={progress} />
+      <BlackfridayHeader progress={introVisible ? undefined : progress} />
+      {session.orderedMode && session.foundCount < 10 ? (
+        <p className="mt-2 text-center text-sm text-white/80">
+          예상 코인 <span className="font-bold text-[#E8C170]">{session.expectedCoins}</span>개
+          <span className="ml-1">(순서대로면 20코인!)</span>
+        </p>
+      ) : null}
 
-      {session.phase === "scan" && session.locationHint ? (
+      {introVisible ? <BlackfridayIntro onStart={() => setShowIntro(false)} /> : null}
+
+      {!introVisible && session.phase === "scan" && session.locationHint ? (
         <section className="mt-4 flex flex-1 flex-col justify-center gap-4 text-center">
           <p className="text-sm text-white/80">다음 QR은 여기에 있어요</p>
           <p className="text-lg font-bold leading-snug text-[#E8C170]">{session.locationHint}</p>
@@ -101,7 +116,7 @@ export function BlackfridayHome() {
         </section>
       ) : null}
 
-      {quiz ? (
+      {!introVisible && quiz ? (
         <BlackfridayQuizPanel
           quiz={quiz}
           revealAnswer={session.revealAnswer}
@@ -110,6 +125,11 @@ export function BlackfridayHome() {
           notice={message}
           onSubmit={postQuiz}
         />
+      ) : null}
+      {!introVisible && session.orderedMode && quiz ? (
+        <Link href="/blackfriday/scan?free=1" className="mt-3 text-center text-sm text-[#E8C170] underline">
+          QR만 찾기 (x2 찬스 포기)
+        </Link>
       ) : null}
       {!session.orderedMode ? (
         <p className="mt-4 text-center text-sm text-white/80">순서 없이 QR을 찾고 있어요. 퀴즈는 더 없어요.</p>
