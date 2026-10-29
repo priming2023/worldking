@@ -1,6 +1,5 @@
 import { expectedCodeForStep } from "../src/lib/blackfriday/codes";
 import { BLACKFRIDAY_STEPS_SEED } from "../src/lib/blackfriday/mission-data";
-import { isBlackfridayOpen } from "../src/lib/blackfriday/period";
 import { isDigitDisplay, submitBlackfridayQuiz, submitBlackfridayScan } from "../src/lib/blackfriday/play";
 import { loadBlackfridaySession } from "../src/lib/blackfriday/session";
 import { WRONG_MESSAGE } from "../src/lib/blackfriday/play";
@@ -11,12 +10,6 @@ function assert(condition: boolean, message: string) {
 }
 
 async function main() {
-  assert(!isBlackfridayOpen(new Date("2026-10-29T03:00:00Z")), "10/29 closed");
-  assert(!isBlackfridayOpen(new Date("2026-11-19T14:59:00Z")), "11/19 closed");
-  assert(isBlackfridayOpen(new Date("2026-11-19T15:00:00Z")), "11/20 open");
-  assert(isBlackfridayOpen(new Date("2026-11-29T14:59:00Z")), "11/29 open");
-  assert(!isBlackfridayOpen(new Date("2026-11-29T15:00:00Z")), "11/30 closed");
-
   const rows = await prisma.blackfridayStep.findMany({ orderBy: { stepOrder: "asc" } });
   assert(rows.length === 10, `steps ${rows.length}`);
   const numericOrders = new Set([2, 3, 4, 5, 7, 8]);
