@@ -1,29 +1,21 @@
-import { Prisma } from "@prisma/client";
 import { parseAnswerDisplay } from "@/lib/chuseok/answer-pattern";
-import { afterCorrectScan, afterQuizCorrect, currentQuizStep } from "@/lib/blackfriday/progress";
+import { afterQuizCorrect, currentQuizStep } from "@/lib/blackfriday/progress";
 import type { ProgressState } from "@/lib/blackfriday/progress";
 import { answersMatch } from "@/lib/chuseok/quiz-normalize";
-import { isMissionCode, MISSION_TOTAL } from "@/lib/blackfriday/codes";
-import {
-  ensureDevice,
-  getOrCreateProgress,
-  getScans,
-  getStepByOrder,
-  getSteps,
-} from "@/lib/blackfriday/db";
-import { kstTodayString } from "@/lib/kst";
+import { ensureDevice, getOrCreateProgress, getStepByOrder } from "@/lib/blackfriday/db";
 import { prisma } from "@/lib/prisma";
-import { parseTreasureCode } from "@/lib/qr";
 
 export const WRONG_MESSAGE = "아쉬워요! 다시 한 번 해볼까요?";
 const REVEAL_AFTER = 3;
 
 function stateOf(progress: {
+  orderedMode: boolean;
   quizzesPassed: number;
   phase: string;
   awaitingScanCode: string | null;
 }): ProgressState {
   return {
+    orderedMode: progress.orderedMode,
     quizzesPassed: progress.quizzesPassed,
     phase: progress.phase as ProgressState["phase"],
     awaitingScanCode: progress.awaitingScanCode,
@@ -41,6 +33,9 @@ export async function submitBlackfridayQuiz(
 ) {
   await ensureDevice(deviceId);
   const progress = await getOrCreateProgress(deviceId);
+  if (!progress.orderedMode) {
+    return { status: 400 as const, body: { error: "unordered_mode", message: "순서 모드가 아니에요. QR만 찾아 주세요!" } };
+  }
   if (progress.phase !== "quiz") {
     return { status: 400 as const, body: { error: "not_quiz_phase", message: "지금은 QR을 찾을 차례예요!" } };
   }
@@ -94,68 +89,6 @@ export async function submitBlackfridayQuiz(
       locationHint: step.locationHint,
       awaitingScanCode: next.awaitingScanCode,
     },
-  };
-}
-
-export async function submitBlackfridayScan(deviceId: string, qrPayload: string) {
-  const code = parseTreasureCode(qrPayload);
-  if (!code || !isMissionCode(code)) {
-    return {
-      status: 400 as const,
-      body: { error: "unknown_qr", message: "월드킹 보물 QR(WK01~WK10)이 아니에요." },
-    };
-  }
-
-  await ensureDevice(deviceId);
-  const scanDateKst = kstTodayString();
-  const progress = await getOrCreateProgress(deviceId);
-
-  const already = await prisma.blackfridayScan.findFirst({
-    where: { deviceId, code, scanDateKst },
-  });
-  if (already) {
-    return { status: 200 as const, body: { status: "duplicate", code, message: "이미 찾은 보물이에요!" } };
-  }
-
-  if (progress.phase !== "scan" || !progress.awaitingScanCode) {
-    return { status: 200 as const, body: { status: "wait_quiz", message: "지금은 문제를 먼저 풀어 주세요!" } };
-  }
-
-  if (code !== progress.awaitingScanCode) {
-    const steps = await getSteps();
-    const expected = steps.find((item) => item.qrCode === progress.awaitingScanCode);
-    const hint = expected?.locationHint ?? progress.awaitingScanCode;
-    return {
-      status: 200 as const,
-      body: {
-        status: "wrong_place",
-        message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!`,
-      },
-    };
-  }
-
-  const scans = await getScans(deviceId, scanDateKst);
-  try {
-    await prisma.blackfridayScan.create({
-      data: { deviceId, code, scanDateKst, sequenceIndex: scans.length + 1 },
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return { status: 200 as const, body: { status: "duplicate", code, message: "이미 찾은 보물이에요!" } };
-    }
-    throw error;
-  }
-
-  const next = afterCorrectScan(stateOf(progress));
-  await prisma.blackfridayProgress.update({
-    where: { id: progress.id },
-    data: { phase: next.phase, awaitingScanCode: next.awaitingScanCode, quizWrongCount: 0 },
-  });
-
-  const foundCount = scans.length + 1;
-  return {
-    status: 200 as const,
-    body: { status: "new", code, foundCount, missionComplete: foundCount >= MISSION_TOTAL },
   };
 }
 

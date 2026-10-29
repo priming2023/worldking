@@ -1,6 +1,8 @@
 import { expectedCodeForStep } from "../src/lib/blackfriday/codes";
 import { BLACKFRIDAY_STEPS_SEED } from "../src/lib/blackfriday/mission-data";
-import { isDigitDisplay, submitBlackfridayQuiz, submitBlackfridayScan } from "../src/lib/blackfriday/play";
+import { isDigitDisplay, submitBlackfridayQuiz } from "../src/lib/blackfriday/play";
+import { submitBlackfridayScan } from "../src/lib/blackfriday/play-scan";
+import { estimateReward } from "../src/lib/blackfriday/reward";
 import { loadBlackfridaySession } from "../src/lib/blackfriday/session";
 import { WRONG_MESSAGE } from "../src/lib/blackfriday/play";
 import { prisma } from "../src/lib/prisma";
@@ -32,7 +34,15 @@ async function main() {
     assert(Boolean(scan.body.missionComplete) === (order === 10), `complete flag ${order}`);
   }
   const done = await loadBlackfridaySession(deviceId);
-  assert(done.missionComplete && done.foundCount === 10 && done.coins === 20, "session complete");
+  assert(done.missionComplete && done.foundCount === 10 && done.expectedCoins === 20, "session complete");
+  assert(done.canClaim && done.rewardMode === "ordered", "ordered claim");
+  const perfect = Array.from({ length: 10 }, (_, index) => ({
+    code: `WK${String(index + 1).padStart(2, "0")}`,
+    sequenceIndex: index + 1,
+  }));
+  assert(estimateReward(false, perfect, 10).coins === 10, "unordered 10");
+  assert(estimateReward(true, perfect.slice(0, 5), 5).coins === 5, "partial 5");
+  assert(estimateReward(true, perfect.slice(0, 4), 4).canClaim === false, "under 5");
 
   const wrongId = crypto.randomUUID();
   for (let i = 1; i <= 2; i += 1) {
@@ -44,10 +54,32 @@ async function main() {
   const skipped = await submitBlackfridayQuiz(wrongId, { skip: true });
   assert(skipped.body.status === "correct", "skip");
   const wrongPlace = await submitBlackfridayScan(wrongId, "worldking:WK05");
-  assert(wrongPlace.body.status === "wrong_place", "wrong place");
+  assert(wrongPlace.body.status === "order_warning", "order warning");
+  const confirmed = await submitBlackfridayScan(wrongId, "worldking:WK05", true);
+  assert(confirmed.body.status === "new" && confirmed.body.orderedMode === false, "unordered scan");
   const rightPlace = await submitBlackfridayScan(wrongId, "worldking:WK01");
   assert(rightPlace.body.status === "new", "wk01");
 
+  const { POST } = await import("../src/app/api/blackfriday/claim/route");
+  const claimRes = await POST(
+    new Request("http://local/api/blackfriday/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deviceId, staffPin: "1001" }),
+    }),
+  );
+  const claimBody = (await claimRes.json()) as { coinAmount?: number };
+  assert(claimRes.status === 200 && claimBody.coinAmount === 20, "staff claim 20");
+  const again = await POST(
+    new Request("http://local/api/blackfriday/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deviceId, staffPin: "1001" }),
+    }),
+  );
+  assert(again.status === 409, "once per day");
+
+  await prisma.blackfridayClaim.deleteMany({ where: { deviceId: { in: [deviceId, wrongId] } } });
   await prisma.blackfridayScan.deleteMany({ where: { deviceId: { in: [deviceId, wrongId] } } });
   await prisma.blackfridayProgress.deleteMany({ where: { deviceId: { in: [deviceId, wrongId] } } });
   await prisma.device.deleteMany({ where: { id: { in: [deviceId, wrongId] } } });

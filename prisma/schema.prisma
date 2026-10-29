@@ -175,6 +175,7 @@ model BlackfridayProgress {
   id               String   @id @default(cuid())
   deviceId         String
   scanDateKst      String
+  orderedMode      Boolean  @default(true)
   quizzesPassed    Int      @default(0)
   phase            String   @default("quiz")
   awaitingScanCode String?
@@ -196,4 +197,17 @@ model BlackfridayScan {
 
   @@unique([deviceId, code, scanDateKst])
   @@index([deviceId, scanDateKst])
+}
+
+/// 블랙프라이데이 하루 1회 코인 수령 (KST)
+model BlackfridayClaim {
+  id           String   @id @default(cuid())
+  deviceId     String
+  claimDateKst String
+  coinAmount   Int
+  rewardMode   String
+  createdAt    DateTime @default(now())
+
+  @@unique([deviceId, claimDateKst])
+  @@index([deviceId])
 }

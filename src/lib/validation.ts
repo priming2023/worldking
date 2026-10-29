@@ -81,6 +81,12 @@ export const blackfridayQuizBodySchema = z.object({
 export const blackfridayScanBodySchema = z.object({
   deviceId: z.string().uuid(),
   qrPayload: z.string().min(1).max(4096),
+  confirmOutOfOrder: z.boolean().optional(),
+});
+
+export const blackfridayClaimBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  staffPin: z.string().min(1).max(32),
 });
 
 export const blackfridayStepUpdateSchema = z.object({
