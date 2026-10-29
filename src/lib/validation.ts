@@ -70,3 +70,24 @@ export const halloweenStepUpdateSchema = z.object({
   answerDisplay: z.string().min(2).max(500),
   locationHint: z.string().min(1).max(200),
 });
+
+export const blackfridayQuizBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  answer: z.string().max(100).optional(),
+  /** 3회 오답 후 정답을 보고 다음으로 */
+  skip: z.boolean().optional(),
+});
+
+export const blackfridayScanBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  qrPayload: z.string().min(1).max(4096),
+});
+
+export const blackfridayStepUpdateSchema = z.object({
+  stepOrder: z.number().int().min(1).max(10),
+  question: z.string().min(1).max(500),
+  answer: z.string().min(1).max(100),
+  answerDisplay: z.string().min(2).max(500),
+  locationHint: z.string().min(1).max(300),
+  hint: z.string().min(1).max(300),
+});

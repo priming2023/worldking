@@ -29,12 +29,13 @@ type Props = {
   onDecoded: (text: string) => void;
   onCameraError?: (message: string) => void;
   onFlipMeta?: (meta: QrCameraFlipMeta) => void;
+  frameClassName?: string;
 };
 
 type Engine = "checking" | "native" | "zxing";
 
 export const QrCameraScanner = forwardRef<QrCameraScannerHandle, Props>(
-  function QrCameraScanner({ active, onDecoded, onCameraError, onFlipMeta }, ref) {
+  function QrCameraScanner({ active, onDecoded, onCameraError, onFlipMeta, frameClassName }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const stopperRef = useRef<{ stop: () => void } | null>(null);
     const zxingAltIdRef = useRef<string | undefined>(undefined);
@@ -148,7 +149,7 @@ export const QrCameraScanner = forwardRef<QrCameraScannerHandle, Props>(
 
     return (
       <div className="flex flex-col gap-3">
-        <div className="relative overflow-hidden rounded-3xl bg-black shadow-md ring-2 ring-amber-200/60">
+        <div className={`relative overflow-hidden rounded-3xl bg-black shadow-md ring-2 ${frameClassName ?? "ring-amber-200/60"}`}>
           {starting && (
             <div
               className="absolute inset-0 z-10 flex items-center justify-center bg-black/45 px-4 text-center text-sm font-bold text-white"

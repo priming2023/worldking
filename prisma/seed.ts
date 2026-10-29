@@ -8,6 +8,10 @@ import {
   MISSION_STEPS_SEED as HALLOWEEN_STEPS,
   seedStepToDb as seedHalloweenStep,
 } from "../src/lib/halloween/mission-data";
+import {
+  BLACKFRIDAY_STEPS_SEED,
+  seedStepToDb as seedBlackfridayStep,
+} from "../src/lib/blackfriday/mission-data";
 
 const prisma = new PrismaClient();
 
@@ -33,6 +37,15 @@ async function main() {
   for (const step of HALLOWEEN_STEPS) {
     const data = seedHalloweenStep(step);
     await prisma.halloweenStep.upsert({
+      where: { stepOrder: step.stepOrder },
+      create: data,
+      update: {},
+    });
+  }
+
+  for (const step of BLACKFRIDAY_STEPS_SEED) {
+    const data = seedBlackfridayStep(step);
+    await prisma.blackfridayStep.upsert({
       where: { stepOrder: step.stepOrder },
       create: data,
       update: {},

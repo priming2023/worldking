@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 export type AnswerBoxes = string[][];
 
-export type QuizAnswerTheme = "chuseok" | "halloween";
+export type QuizAnswerTheme = "chuseok" | "halloween" | "blackfriday";
 
 type Props = {
   theme: QuizAnswerTheme;
@@ -13,6 +13,7 @@ type Props = {
   disabled?: boolean;
   countLabel?: string;
   numeric?: boolean;
+  compact?: boolean;
 };
 
 function graphemes(text: string): string[] {
@@ -40,6 +41,14 @@ const themeClass = {
       "min-h-14 w-full rounded-2xl border-2 border-halloween-gold/60 bg-[#1a0b2e] px-4 py-3 text-center text-lg font-bold text-white shadow-sm outline-none placeholder:font-semibold placeholder:text-white/40 focus:border-halloween-gold focus:ring-2 focus:ring-halloween-gold/30 disabled:opacity-50",
     button: "halloween-btn-primary",
   },
+  blackfriday: {
+    dot: "text-[#E8C170]/70",
+    box: "flex h-8 w-8 items-center justify-center rounded-md border border-[#E8C170]/70 bg-black text-base font-bold text-white",
+    label: "text-[#E8C170]",
+    input:
+      "min-h-11 w-full rounded-xl border border-[#E8C170]/70 bg-black px-3 py-2 text-center text-base font-bold text-white outline-none placeholder:text-white/35 focus:border-[#E8C170] disabled:opacity-50",
+    button: "bg-[#E8C170] text-black",
+  },
 } as const;
 
 /**
@@ -53,6 +62,7 @@ export function QuizAnswerField({
   disabled,
   countLabel,
   numeric = false,
+  compact = false,
 }: Props) {
   const ui = themeClass[theme];
   const flatCount = display.reduce((sum, group) => sum + group.length, 0);
@@ -100,7 +110,7 @@ export function QuizAnswerField({
   let flatIdx = 0;
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-4">
+    <form onSubmit={handleSubmit} className={`flex w-full flex-col items-center ${compact ? "gap-2" : "gap-4"}`}>
       <div className="flex flex-wrap items-center justify-center gap-3">
         {display.map((group, gi) => (
           <div key={gi} className="flex items-center gap-3">
@@ -152,7 +162,7 @@ export function QuizAnswerField({
       <button
         type="submit"
         disabled={disabled || chars.length === 0}
-        className={`${ui.button} min-h-14 w-full max-w-sm rounded-2xl px-6 py-3 text-lg font-extrabold disabled:opacity-50`}
+        className={`${ui.button} w-full max-w-sm rounded-2xl px-6 font-extrabold disabled:opacity-50 ${compact ? "min-h-11 py-2 text-base" : "min-h-14 py-3 text-lg"}`}
       >
         정답 확인
       </button>

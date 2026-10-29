@@ -156,3 +156,44 @@ model HalloweenClaim {
   @@unique([deviceId, claimDateKst])
   @@index([deviceId])
 }
+
+/// 블랙프라이데이 QR 보물찾기 — 퀴즈·위치 (관리자 편집)
+model BlackfridayStep {
+  id            Int      @id @default(autoincrement())
+  stepOrder     Int      @unique
+  question      String
+  answer        String
+  answerDisplay String
+  locationHint  String
+  hint          String
+  qrCode        String
+  updatedAt     DateTime @updatedAt
+}
+
+/// 블랙프라이데이 일별 진행 (KST)
+model BlackfridayProgress {
+  id               String   @id @default(cuid())
+  deviceId         String
+  scanDateKst      String
+  quizzesPassed    Int      @default(0)
+  phase            String   @default("quiz")
+  awaitingScanCode String?
+  quizWrongCount   Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([deviceId, scanDateKst])
+  @@index([deviceId])
+}
+
+model BlackfridayScan {
+  id            String   @id @default(cuid())
+  deviceId      String
+  code          String
+  scanDateKst   String
+  scannedAt     DateTime @default(now())
+  sequenceIndex Int
+
+  @@unique([deviceId, code, scanDateKst])
+  @@index([deviceId, scanDateKst])
+}
