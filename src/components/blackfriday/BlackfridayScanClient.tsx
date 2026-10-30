@@ -153,12 +153,16 @@ export function BlackfridayScanClient() {
             <button
               type="button"
               className="mt-4 w-full rounded-xl bg-[#E8C170] py-3 font-bold text-black"
+              onClick={() => setOrderText("")}
+            >
+              계속 순서대로
+            </button>
+            <button
+              type="button"
+              className="mt-2 w-full rounded-xl border border-white/25 py-3 text-sm text-white/70"
               onClick={() => void postScan(pendingCode, true)}
             >
               순서 없이 찾을게요
-            </button>
-            <button type="button" className="mt-2 w-full py-2 text-sm text-white/70" onClick={() => setOrderText("")}>
-              계속 순서대로
             </button>
           </div>
         </div>
