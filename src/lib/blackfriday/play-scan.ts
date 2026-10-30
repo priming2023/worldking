@@ -77,7 +77,7 @@ export async function submitBlackfridayScan(
           status: 200 as const,
           body: {
             status: "order_warning",
-            message: `지금은 ${hint} 의 ${progress.awaitingScanCode} QR을 찾아 주세요!\n\n순서를 어기면 20코인 찬스는 사라져요.\n정말 순서 없이 이 QR을 스캔할까요?`,
+            message: `지금은 ${hint}의 QR을 찾을 차례예요.\n\n순서를 어기면 20코인 찬스는 사라져요.\n정말 순서 없이 이 QR을 스캔할까요?`,
             scannedCode: code,
             expectedCode: progress.awaitingScanCode,
             locationHint: hint,
