@@ -6,6 +6,8 @@ import { BlackfridayHeader } from "@/components/blackfriday/BlackfridayHeader";
 import { BlackfridayPinModal } from "@/components/blackfriday/BlackfridayPinModal";
 import { useBlackfridayDeviceId } from "@/hooks/blackfriday/useBlackfridayDeviceId";
 
+const INSTAGRAM_URL = "https://www.instagram.com/worldking_dangjin.seosan?rpxt=M2ZqZWJzaTR3Nnk0";
+
 type Session = {
   foundCount: number;
   expectedCoins: number;
@@ -20,6 +22,7 @@ export function BlackfridayClaim() {
   const [pinOpen, setPinOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFollow, setShowFollow] = useState(false);
 
   const reload = useCallback(async () => {
     if (!deviceId) return;
@@ -50,6 +53,7 @@ export function BlackfridayClaim() {
         return;
       }
       setPinOpen(false);
+      setShowFollow(true);
       await reload();
     } finally {
       setBusy(false);
@@ -69,13 +73,27 @@ export function BlackfridayClaim() {
           <p className="mt-3 text-sm text-white/80">보물을 5개 이상 찾으면 찾은 개수만큼 받을 수 있어요.</p>
         </section>
       ) : null}
-      {session.claimedToday ? (
+      {showFollow ? (
+        <section className="mt-8">
+          <h1 className="text-2xl font-bold">인스타그램 팔로우 이벤트예요.</h1>
+          <p className="mt-3 text-base leading-relaxed">괜찮으시면 팔로우 부탁드려요.</p>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 block rounded-xl bg-[#E8C170] py-3 text-base font-bold text-black"
+          >
+            팔로우 하러가기
+          </a>
+        </section>
+      ) : null}
+      {session.claimedToday && !showFollow ? (
         <section className="mt-8">
           <h1 className="text-2xl font-bold">오늘 코인은 이미 받았어요</h1>
           <p className="mt-3 text-sm">오늘 {session.todayClaim?.coinAmount}코인을 받았어요. 내일 다시 받을 수 있어요.</p>
         </section>
       ) : null}
-      {session.foundCount >= 5 && !session.claimedToday ? (
+      {session.foundCount >= 5 && !session.claimedToday && !showFollow ? (
         <section className="mt-8">
           <h1 className="text-2xl font-bold">코인 받기</h1>
           <p className="mt-4 text-4xl font-bold text-[#E8C170]">{session.expectedCoins}코인</p>
