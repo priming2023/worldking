@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WinterFinishSummary } from "@/components/winter/WinterFinishSummary";
 import { WinterPinModal } from "@/components/winter/WinterPinModal";
+import { WinterQuitConfirm } from "@/components/winter/WinterQuitConfirm";
 import { WinterScanResultModals } from "@/components/winter/WinterScanResultModals";
 import { WinterTimerHud } from "@/components/winter/WinterTimerHud";
 import { QrCameraScanner } from "@/components/scan/QrCameraScanner";
@@ -27,6 +28,7 @@ export function WinterScanClient() {
   const [pinOpen, setPinOpen] = useState(false);
   const [pinBusy, setPinBusy] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
+  const [quitConfirmOpen, setQuitConfirmOpen] = useState(false);
   const finishLockRef = useRef(false);
 
   const remainingMs = useWinterTimer(session?.endsAt ?? null, session?.status === "playing");
@@ -153,7 +155,7 @@ export function WinterScanClient() {
     return <p className="px-5 py-10 text-center text-sm text-white/80">불러오는 중…</p>;
   }
 
-  const modalBlocking = dupOpen || successOpen || summaryOpen || pinOpen;
+  const modalBlocking = dupOpen || successOpen || summaryOpen || pinOpen || quitConfirmOpen;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-8 pt-4">
@@ -180,7 +182,7 @@ export function WinterScanClient() {
         <button
           type="button"
           disabled={session.foundCount < 1 || session.status !== "playing" || finishing}
-          onClick={() => void finishGame("early")}
+          onClick={() => setQuitConfirmOpen(true)}
           className="winter-btn-primary rounded-2xl py-3 disabled:opacity-40"
         >
           이대로 받기 ({session.foundCount}코인)
@@ -192,6 +194,17 @@ export function WinterScanClient() {
           홈으로
         </Link>
       </div>
+
+      <WinterQuitConfirm
+        open={quitConfirmOpen}
+        foundCount={session.foundCount}
+        busy={finishing}
+        onCancel={() => setQuitConfirmOpen(false)}
+        onConfirm={() => {
+          setQuitConfirmOpen(false);
+          void finishGame("early");
+        }}
+      />
 
       <WinterScanResultModals
         dupOpen={dupOpen}
