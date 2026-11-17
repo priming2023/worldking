@@ -3,14 +3,17 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 
-const ENTRY_PATH = "/winter";
+const PROD_ENTRY_URL = "https://worldking-t86b.vercel.app/winter";
 
 export default function WinterEntryQrPage() {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [entryUrl, setEntryUrl] = useState("");
+  const [entryUrl, setEntryUrl] = useState(PROD_ENTRY_URL);
 
   useEffect(() => {
-    const url = `${window.location.origin}${ENTRY_PATH}`;
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/winter`
+        : PROD_ENTRY_URL;
     setEntryUrl(url);
     void QRCode.toDataURL(url, {
       width: 512,
