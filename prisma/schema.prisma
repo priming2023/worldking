@@ -211,3 +211,49 @@ model BlackfridayClaim {
   @@unique([deviceId, claimDateKst])
   @@index([deviceId])
 }
+
+/// 2027 새해 겨울 QR 타임어택 보물찾기 — 일별 진행 (KST)
+model WinterProgress {
+  id            String    @id @default(cuid())
+  deviceId      String
+  scanDateKst   String
+  /// 돌림판으로 확정된 제한 시간(분). 시작 전엔 null
+  timeLimitMin  Int?
+  startedAt     DateTime?
+  endsAt        DateTime?
+  /// idle | playing | finished
+  status        String    @default("idle")
+  /// early | timeout | null
+  finishReason  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([deviceId, scanDateKst])
+  @@index([deviceId])
+}
+
+model WinterScan {
+  id            String   @id @default(cuid())
+  deviceId      String
+  code          String
+  scanDateKst   String
+  scannedAt     DateTime @default(now())
+  sequenceIndex Int
+
+  @@unique([deviceId, code, scanDateKst])
+  @@index([deviceId, scanDateKst])
+}
+
+/// 겨울 타임어택 하루 1회 코인 수령 (KST)
+model WinterClaim {
+  id           String   @id @default(cuid())
+  deviceId     String
+  claimDateKst String
+  coinAmount   Int
+  timeLimitMin Int
+  finishReason String
+  createdAt    DateTime @default(now())
+
+  @@unique([deviceId, claimDateKst])
+  @@index([deviceId])
+}

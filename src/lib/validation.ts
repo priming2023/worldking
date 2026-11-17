@@ -97,3 +97,32 @@ export const blackfridayStepUpdateSchema = z.object({
   locationHint: z.string().min(1).max(300),
   hint: z.string().min(1).max(300),
 });
+
+export const winterDeviceSchema = z.object({
+  deviceId: z.string().uuid(),
+});
+
+export const winterStartBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  timeLimitMin: z
+    .number()
+    .int()
+    .refine((v) => [5, 6, 7, 8, 9, 10, 11, 12, 13, 15].includes(v), {
+      message: "invalid_time",
+    }),
+});
+
+export const winterScanBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  qrPayload: z.string().min(1).max(4096),
+});
+
+export const winterFinishBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  finishReason: z.enum(["early", "timeout"]),
+});
+
+export const winterClaimBodySchema = z.object({
+  deviceId: z.string().uuid(),
+  staffPin: z.string().min(1).max(32),
+});
