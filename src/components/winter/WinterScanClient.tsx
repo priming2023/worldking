@@ -164,7 +164,7 @@ export function WinterScanClient() {
         timeLimitMin={session.timeLimitMin}
       />
 
-      <p className="mt-3 text-center text-sm text-white/80">매장 안 QR(WK01~WK20)을 찾아 스캔하세요</p>
+      <p className="mt-3 text-center text-sm text-white/80">매장안에 QR코드를 찾아 스캔하세요.</p>
 
       <div className="relative mt-3">
         <QrCameraScanner

@@ -77,21 +77,11 @@ export function WinterMapView() {
         })}
       </ul>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {session.status === "playing" ? (
-          <Link href="/winter/scan" className="winter-btn-primary flex min-h-12 items-center justify-center rounded-2xl">
-            QR 보물찾기
-          </Link>
-        ) : null}
-        <Link
-          href="/winter"
-          className={`winter-btn-ghost flex min-h-12 items-center justify-center rounded-2xl ${
-            session.status === "playing" ? "" : "sm:col-span-2"
-          }`}
-        >
-          홈으로
+      {session.status === "playing" ? (
+        <Link href="/winter/scan" className="winter-btn-primary flex min-h-12 items-center justify-center rounded-2xl">
+          QR 보물찾기
         </Link>
-      </div>
+      ) : null}
     </main>
   );
 }

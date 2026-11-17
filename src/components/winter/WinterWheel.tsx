@@ -5,6 +5,7 @@ import { WINTER_TIME_OPTIONS, type WinterTimeLimitMin } from "@/lib/winter/time-
 
 const SEGMENT = 360 / WINTER_TIME_OPTIONS.length;
 const SPIN_MS = 6800;
+const LABEL_RADIUS = 92;
 
 type Props = {
   disabled?: boolean;
@@ -17,7 +18,18 @@ export function WinterWheel({ disabled, onSpun }: Props) {
   const [result, setResult] = useState<WinterTimeLimitMin | null>(null);
 
   const gradient = useMemo(() => {
-    const colors = ["#163a5c", "#2a6a96", "#1a4a72", "#3d84b0", "#163a5c", "#2a6a96", "#1a4a72", "#3d84b0", "#163a5c", "#2a6a96"];
+    const colors = [
+      "#163a5c",
+      "#2a6a96",
+      "#1a4a72",
+      "#3d84b0",
+      "#163a5c",
+      "#2a6a96",
+      "#1a4a72",
+      "#3d84b0",
+      "#163a5c",
+      "#2a6a96",
+    ];
     const stops = WINTER_TIME_OPTIONS.map((_, i) => {
       const start = i * SEGMENT;
       const end = (i + 1) * SEGMENT;
@@ -27,15 +39,13 @@ export function WinterWheel({ disabled, onSpun }: Props) {
   }, []);
 
   function spin() {
-    if (disabled || spinning) return;
+    if (disabled || spinning || result != null) return;
     const index = Math.floor(Math.random() * WINTER_TIME_OPTIONS.length);
     const minutes = WINTER_TIME_OPTIONS[index]!;
-    // 포인터(상단)에 칸 중앙이 오도록, 현재 각도 기준으로 delta 계산
     const targetCenter = index * SEGMENT + SEGMENT / 2;
     const desiredMod = (360 - targetCenter + 360) % 360;
 
     setSpinning(true);
-    setResult(null);
     setRotation((prev) => {
       const currentMod = ((prev % 360) + 360) % 360;
       let delta = desiredMod - currentMod;
@@ -69,13 +79,18 @@ export function WinterWheel({ disabled, onSpun }: Props) {
           }}
         >
           {WINTER_TIME_OPTIONS.map((min, i) => {
-            const mid = i * SEGMENT + SEGMENT / 2;
+            const midDeg = i * SEGMENT + SEGMENT / 2;
+            const rad = (midDeg * Math.PI) / 180;
+            const x = Math.sin(rad) * LABEL_RADIUS;
+            const y = -Math.cos(rad) * LABEL_RADIUS;
             return (
               <span
                 key={min}
-                className="absolute left-1/2 top-1/2 text-base font-extrabold tabular-nums text-white"
+                className="absolute text-base font-extrabold tabular-nums text-white"
                 style={{
-                  transform: `translate(-50%, -50%) rotate(${mid}deg) translateY(-88px) rotate(${-(mid + rotation)}deg)`,
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
                 }}
               >
                 {min}
@@ -86,22 +101,24 @@ export function WinterWheel({ disabled, onSpun }: Props) {
         </div>
       </div>
 
-      <button
-        type="button"
-        disabled={disabled || spinning}
-        onClick={spin}
-        className="winter-btn-primary mt-5 w-full max-w-xs rounded-2xl py-3 text-base"
-      >
-        {spinning ? "돌리는 중…" : result ? "다시 돌리기" : "돌림판 돌리기"}
-      </button>
-
-      {result ? (
-        <p className="mt-3 text-center text-lg font-bold text-[var(--winter-gold)]">
+      {result == null ? (
+        <button
+          type="button"
+          disabled={disabled || spinning}
+          onClick={spin}
+          className="winter-btn-primary mt-5 w-full max-w-xs rounded-2xl py-3 text-base"
+        >
+          {spinning ? "돌리는 중…" : "돌림판 돌리기"}
+        </button>
+      ) : (
+        <p className="mt-5 text-center text-lg font-bold text-[var(--winter-gold)]">
           {result}분 안에 찾아요!
         </p>
-      ) : (
-        <p className="mt-3 text-center text-sm text-white/70">제한 시간을 정해 주세요</p>
       )}
+
+      {result == null && !spinning ? (
+        <p className="mt-3 text-center text-sm text-white/70">제한 시간을 정해 주세요</p>
+      ) : null}
     </div>
   );
 }

@@ -83,8 +83,6 @@ export function WinterClaim() {
           <p className="mt-2 text-5xl font-bold text-[var(--winter-gold)]">{session.expectedCoins}코인</p>
           <p className="mt-4 text-sm leading-relaxed text-white/85">
             카운터 직원에게 이 화면을 보여 주세요.
-            <br />
-            확인 후 인스타그램으로 바로 연결돼요.
           </p>
           <button
             type="button"

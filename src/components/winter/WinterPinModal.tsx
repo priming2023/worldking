@@ -27,10 +27,10 @@ export function WinterPinModal({
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 px-4 pb-8 sm:items-center">
       <div className="winter-card w-full max-w-sm rounded-2xl p-5 text-white">
         <h2 className="text-lg font-bold text-[var(--winter-gold)]">직원 확인</h2>
-        <p className="mt-2 text-sm text-white/85">
-          직원이 비밀번호를 입력한 뒤 코인 수령을 확정해 주세요.
+        <p className="mt-2 text-sm leading-relaxed text-white/85">
+          카운터에서 직원에게 이 화면을 보여주세요.
           <br />
-          (어린이 1명당 1회 · 인스타 팔로워 확인)
+          (어린이 1명당 1회, 인스타 팔로워 이벤트)
         </p>
         <input
           type="password"
