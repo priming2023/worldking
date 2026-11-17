@@ -13,17 +13,22 @@ type ScanResult = {
 
 export function useWinterScanHandler(
   deviceId: string | null,
-  onSuccess: (foundCount: number) => void,
+  onSuccess: (foundCount: number, code: string) => void,
   onFinished: () => void,
 ) {
   const handling = useRef(false);
   const lastRawRef = useRef("");
   const lastScanAtRef = useRef(0);
+  const [dupOpen, setDupOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
+  const [successCode, setSuccessCode] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
 
   const handleDecoded = useCallback(
     async (text: string) => {
       if (!deviceId || handling.current) return;
+      if (dupOpen || successOpen) return;
       if (!parseTreasureCode(text)) return;
 
       const now = Date.now();
@@ -50,7 +55,7 @@ export function useWinterScanHandler(
         }
 
         if (json.status === "duplicate") {
-          setNotice(json.message ?? "이미 찾은 보물이에요!");
+          setDupOpen(true);
           return;
         }
         if (json.status === "unknown_qr") {
@@ -58,8 +63,12 @@ export function useWinterScanHandler(
           return;
         }
         if (json.status === "ok") {
-          setNotice(`${json.code} 찾았어요!`);
-          onSuccess(json.foundCount ?? 0);
+          const count = json.foundCount ?? 0;
+          const code = json.code ?? "";
+          setSuccessCount(count);
+          setSuccessCode(code);
+          setSuccessOpen(true);
+          onSuccess(count, code);
           return;
         }
         setNotice(json.message ?? "다시 찍어 주세요.");
@@ -69,8 +78,17 @@ export function useWinterScanHandler(
         handling.current = false;
       }
     },
-    [deviceId, onFinished, onSuccess],
+    [deviceId, dupOpen, onFinished, onSuccess, successOpen],
   );
 
-  return { notice, setNotice, handleDecoded };
+  return {
+    notice,
+    dupOpen,
+    setDupOpen,
+    successOpen,
+    setSuccessOpen,
+    successCount,
+    successCode,
+    handleDecoded,
+  };
 }

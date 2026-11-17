@@ -116,5 +116,6 @@
 }
 
 .winter-wheel {
-  transition: transform 4s cubic-bezier(0.12, 0.75, 0.08, 1);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.12, 0.82, 0.08, 1);
 }

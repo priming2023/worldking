@@ -16,8 +16,8 @@ const notoSans = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "2027 새해 QR 보물찾기 | 월드킹",
-  description: "새해 타임어택 QR 보물찾기! 돌림판으로 시간을 정하고 WK01~WK20을 찾아요.",
+  title: "월드킹 타임어택 QR 보물찾기",
+  description: "돌림판으로 시간을 정하고 WK01~WK20을 찾아 코인을 받아요.",
   robots: { index: false, follow: false },
 };
 

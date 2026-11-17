@@ -55,9 +55,8 @@ export function WinterHome() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-10 pt-8">
       <header className="text-center">
-        <p className="text-xs font-semibold tracking-[0.35em] text-[var(--winter-frost)]">2027 NEW YEAR</p>
-        <h1 className="winter-title mt-2 text-4xl font-bold text-white sm:text-5xl">월드킹</h1>
-        <p className="mt-2 text-base text-white/85">새해 QR 보물찾기 · 타임어택</p>
+        <h1 className="winter-title text-3xl font-bold text-white sm:text-4xl">월드킹</h1>
+        <p className="mt-2 text-base font-semibold text-white/90">타임어택 QR 보물찾기</p>
       </header>
 
       <div className="mt-6">
@@ -99,14 +98,17 @@ export function WinterHome() {
           <Link href="/winter/scan" className="winter-btn-primary mt-5 block rounded-2xl py-3">
             이어서 찾기
           </Link>
+          <Link href="/winter/map" className="winter-btn-ghost mt-3 block rounded-2xl py-3">
+            보물지도 보기
+          </Link>
         </section>
       ) : null}
 
       {!session.claimedToday && session.status === "finished" ? (
         <section className="winter-card mt-6 rounded-3xl px-5 py-6 text-center">
-          <h2 className="text-xl font-bold">시간 종료!</h2>
+          <h2 className="text-xl font-bold">게임 종료!</h2>
           <p className="mt-2 text-sm text-white/80">
-            {session.foundCount}개 찾았어요 · 예상 {session.expectedCoins}코인
+            보물 {session.foundCount}개 · {session.expectedCoins}코인
           </p>
           {session.canClaim ? (
             <Link href="/winter/claim" className="winter-btn-primary mt-5 block rounded-2xl py-3">
@@ -115,6 +117,9 @@ export function WinterHome() {
           ) : (
             <p className="mt-4 text-sm text-white/70">보물을 1개 이상 찾아야 코인을 받을 수 있어요.</p>
           )}
+          <Link href="/winter/map" className="mt-3 block text-sm text-white/65 underline">
+            보물지도 보기
+          </Link>
         </section>
       ) : null}
     </main>

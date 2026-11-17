@@ -36,8 +36,7 @@ export default function WinterEntryQrPage() {
       </div>
 
       <div className="winter-card w-full rounded-3xl p-8 text-center">
-        <p className="text-xs font-semibold tracking-[0.28em] text-[var(--winter-frost)]">2027 NEW YEAR</p>
-        <h1 className="winter-title mt-2 text-2xl font-bold">월드킹 새해 보물찾기</h1>
+        <h1 className="winter-title mt-2 text-2xl font-bold">월드킹 타임어택 QR 보물찾기</h1>
         <p className="mt-2 text-sm text-white/80">이 QR을 스캔하면 타임어택이 시작돼요</p>
 
         {dataUrl ? (
